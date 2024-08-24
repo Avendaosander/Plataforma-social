@@ -7,6 +7,7 @@ CREATE TABLE `User` (
     `description` VARCHAR(191) NOT NULL DEFAULT '',
     `avatar` VARCHAR(191) NOT NULL DEFAULT '',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `User_email_key`(`email`),
     UNIQUE INDEX `User_username_key`(`username`),
@@ -15,7 +16,7 @@ CREATE TABLE `User` (
 
 -- CreateTable
 CREATE TABLE `Setting` (
-    `idSettings` VARCHAR(191) NOT NULL,
+    `idSetting` VARCHAR(191) NOT NULL,
     `idUser` VARCHAR(191) NOT NULL,
     `private` BOOLEAN NOT NULL DEFAULT false,
     `n_ratings` BOOLEAN NOT NULL DEFAULT true,
@@ -27,7 +28,7 @@ CREATE TABLE `Setting` (
     `n_email_followers` BOOLEAN NOT NULL DEFAULT true,
 
     UNIQUE INDEX `Setting_idUser_key`(`idUser`),
-    PRIMARY KEY (`idSettings`)
+    PRIMARY KEY (`idSetting`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -36,8 +37,9 @@ CREATE TABLE `Post` (
     `idUser` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NOT NULL,
-    `UpdatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `preview` VARCHAR(191) NOT NULL DEFAULT '',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -47,7 +49,7 @@ CREATE TABLE `Comment` (
     `id` VARCHAR(191) NOT NULL,
     `idPost` VARCHAR(191) NOT NULL,
     `idUser` VARCHAR(191) NOT NULL,
-    `comment` VARCHAR(191) NOT NULL,
+    `text` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -72,12 +74,11 @@ CREATE TABLE `Stack` (
 
 -- CreateTable
 CREATE TABLE `Rating` (
-    `id` VARCHAR(191) NOT NULL,
     `idPost` VARCHAR(191) NOT NULL,
     `idUser` VARCHAR(191) NOT NULL,
     `rating` DOUBLE NOT NULL,
 
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`idPost`, `idUser`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -86,6 +87,34 @@ CREATE TABLE `Follower` (
     `idFollowing` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`idFollower`, `idFollowing`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `File` (
+    `id` VARCHAR(191) NOT NULL,
+    `idPost` VARCHAR(191) NOT NULL,
+    `file` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Post_saved` (
+    `idUser` VARCHAR(191) NOT NULL,
+    `idPost` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`idPost`, `idUser`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Notification` (
+    `id` VARCHAR(191) NOT NULL,
+    `idUser` VARCHAR(191) NOT NULL,
+    `message` VARCHAR(191) NOT NULL,
+    `read` BOOLEAN NOT NULL DEFAULT false,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
@@ -117,3 +146,15 @@ ALTER TABLE `Follower` ADD CONSTRAINT `Follower_idFollower_fkey` FOREIGN KEY (`i
 
 -- AddForeignKey
 ALTER TABLE `Follower` ADD CONSTRAINT `Follower_idFollowing_fkey` FOREIGN KEY (`idFollowing`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `File` ADD CONSTRAINT `File_idPost_fkey` FOREIGN KEY (`idPost`) REFERENCES `Post`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Post_saved` ADD CONSTRAINT `Post_saved_idUser_fkey` FOREIGN KEY (`idUser`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Post_saved` ADD CONSTRAINT `Post_saved_idPost_fkey` FOREIGN KEY (`idPost`) REFERENCES `Post`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Notification` ADD CONSTRAINT `Notification_idUser_fkey` FOREIGN KEY (`idUser`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
