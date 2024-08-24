@@ -1,15 +1,61 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { Context, Token } from '../../types';
 
 const prisma = new PrismaClient();
 
-export const getUsers = async () => {
-  return await prisma.user.findMany()
+export const getUsers = async (_: any, {}, context: Context) => {
+	try {
+		if (!context.auth) {
+			throw new GraphQLError("Not authenticated", {
+				extensions: {
+					code: "UNAUTHENTICATED",
+					http: { status: 401 }
+				}
+			})
+		}
+
+    return await prisma.user.findMany()
+
+	} catch (error) {
+    if (error instanceof GraphQLError) {
+      // Re-lanzar errores conocidos de GraphQL
+      throw error;
+    } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // Manejar errores específicos de Prisma
+      throw new GraphQLError("Error en la base de datos", {
+        extensions: {
+          code: "DATABASE_ERROR",
+          http: { status: 500 }
+        }
+      });
+    } else {
+      // Manejar errores inesperados
+      throw new GraphQLError("Internal server error", {
+        extensions: {
+          code: "INTERNAL_SERVER_ERROR",
+          http: { status: 500 }
+        }
+      });
+    }
+		
+	}
 }
 
-export const getUser = async (_: any, { id }: { id: string }) => {
+export const getUser = async (_: any, { id }: { id: string }, context: Context) => {
+  if (!context.auth) {
+    throw new GraphQLError('Not authenticated', {
+      extensions: {
+        code: 'UNAUTHENTICATED',
+        http: { status: 401 }
+      }
+    })
+  }
+
   const userFound = await prisma.user.findUnique({ where: { id } })
+
   if (!userFound) {
     throw new GraphQLError('Not found', {
       extensions: {
@@ -36,7 +82,21 @@ export const login = async (_: any, { email }: { email: string }) => {
       }
     })
   }
-  return userFound
+
+  const dataToken: Token = {
+    id: userFound.id,
+    email: userFound.email,
+    username: userFound.username,
+  }
+  
+  const token = jwt.sign(dataToken, process.env.SECRETTK, {
+    expiresIn: '7d'
+  })
+  
+  return {
+    ...userFound,
+    token
+  }
 }
 
 export const postUser = async (_: any, { username, email, password }: { username: string, email: string, password: string }) => {
@@ -75,7 +135,16 @@ export const postUser = async (_: any, { username, email, password }: { username
   return newUser
 };
 
-export const putUser = async (_: any, { id, username, description, avatar }: { id: string, username?: string, description?: string, avatar?: string }) => {
+export const putUser = async (_: any, { id, username, description, avatar }: { id: string, username?: string, description?: string, avatar?: string }, context: Context) => {
+  if (!context.auth) {
+    throw new GraphQLError('Not authenticated', {
+      extensions: {
+        code: 'UNAUTHENTICATED',
+        http: { status: 401 }
+      }
+    })
+  }
+  
   const userFound = await prisma.user.findFirst({
     where: { username }
   })
