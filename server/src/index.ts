@@ -17,7 +17,9 @@ import { resolvers } from "./graphql/resolvers/index.js"
 import { insertTechs } from "./helpers/insertData.js"
 import { Context, Token } from "./types.js"
 import router from "./routes/uploads.js"
-insertTechs()
+import { defaultData } from "./helpers/insertDefaultData.js"
+await insertTechs()
+await defaultData()
 
 const prisma = new PrismaClient();
 
@@ -80,7 +82,6 @@ const main = async () => {
 					const decoded = jwt.verify(accessToken, process.env.SECRETTK) as Token
 					
 					const user = await prisma.user.findUnique({ where: { id: decoded.id }})
-					
 					if (user) {
 						return { id: user.id, auth: true}
 					}
