@@ -3,6 +3,8 @@ import { GraphQLError } from "graphql"
 import { Context, NewTechnology, PostFilterInput } from "../../types"
 import { MESSAGE, SUBSCRIPTIONS_EVENTS } from "../../lib/constant.js"
 import { wsPublish } from "../../lib/functions.js"
+import { promises as fs } from 'fs';
+import path from "path"
 
 const prisma = new PrismaClient()
 
@@ -32,6 +34,9 @@ export const getPosts = async (_: any, {}, context: Context) => {
 						Post_saved: true
 					}
 				}
+			},
+			orderBy: {
+				createdAt: "desc"
 			}
 		})
 
@@ -239,6 +244,9 @@ export const getPost = async (
 				Comment: {
 					include: {
 						user: true
+					},
+					orderBy: {
+						createdAt: "desc"
 					}
 				},
 				Stack: {
@@ -251,7 +259,8 @@ export const getPost = async (
 					select: {
 						Post_saved: true
 					}
-				}
+				},
+				File: true
 			}
 		})
 		if (!postFound) {
@@ -294,13 +303,11 @@ export const postPost = async (
 		description,
 		technologies,
 		newTechnologies,
-		files
 	}: {
 		title: string
 		description: string
 		technologies: [Technology]
 		newTechnologies: [NewTechnology]
-		files: [{ name: string }]
 	},
 	context: Context
 ) => {
@@ -344,7 +351,6 @@ export const postPost = async (
 		let technologiesFormated: Technology[] = [...technologies]
 
 		if (newTechnologies) {
-			console.log("entra aqui?")
 			const resNewTechnologies = await prisma.technology.createMany({
 				data: newTechnologies
 			})
@@ -357,8 +363,8 @@ export const postPost = async (
 				}
 			})
 
-			console.log("Stack: ", technologies)
-			console.log("NewStack: ", createdTechnologies)
+			// console.log("Stack: ", technologies)
+			// console.log("NewStack: ", createdTechnologies)
 
 			technologiesFormated = [...technologies, ...createdTechnologies]
 		}
@@ -370,13 +376,13 @@ export const postPost = async (
 				idTechnology: tech.id
 			}))
 
-		console.log("Stack formated: ", stackFormated)
+		// console.log("Stack formated: ", stackFormated)
 
 		const resStack = await prisma.stack.createMany({
 			data: stackFormated
 		})
 
-		console.log("Resultado de Stack: ", resStack)
+		// console.log("Resultado de Stack: ", resStack)
 		await wsPublish({
 			subscriptionName: SUBSCRIPTIONS_EVENTS.POST_CREATED,
 			payloadName: 'postCreated',
@@ -488,7 +494,10 @@ export const deletePost = async (
 		}
 
     const isExist = await prisma.post.findUnique({
-      where: { id }
+      where: { id },
+			include: {
+				File: true
+			}
     })
   
     if (!isExist) {
@@ -498,6 +507,33 @@ export const deletePost = async (
           http: { status: 404 }
         }
       })
+    }
+
+		const previewPath = isExist.preview
+		const filePaths = isExist.File
+
+		if (filePaths.length >= 1) {
+			filePaths.forEach(async file => {
+				const fullPath = path.resolve(`uploads/files/${file.file}`);
+				// console.log('fullPath: ', fullPath)
+				try {
+					await fs.access(fullPath)
+					await fs.unlink(fullPath)
+				} catch (err) {
+					console.error(`No se pudo eliminar el archivo: ${fullPath}`, err);
+				}
+			})
+    }
+
+		if (previewPath) {
+			const fullPath = path.resolve(`uploads/preview/${previewPath}`);
+			// console.log('fullPath: ', fullPath)
+			try {
+				await fs.access(fullPath)
+				await fs.unlink(fullPath)
+			} catch (err) {
+				console.error(`No se pudo eliminar el archivo: ${fullPath}`, err);
+			}
     }
 
 		return await prisma.post.delete({

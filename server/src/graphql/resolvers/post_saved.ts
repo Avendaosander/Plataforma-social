@@ -16,7 +16,20 @@ export const getPostsSaved = async (_: any, { idUser }: { idUser: string }, cont
     }
 
     const posts = await prisma.post_saved.findMany({
-      where: { idUser }
+      where: { idUser },
+      include: {
+        post: {
+          include: {
+            user: true,
+            Stack: {
+              include: {
+                tech: true
+              }
+            },
+            File: true,
+          }
+        }
+      }
     });
 
     return posts

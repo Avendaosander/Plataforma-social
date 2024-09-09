@@ -3,6 +3,8 @@ import { GraphQLError } from 'graphql';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Context, Token } from '../../types';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 const prisma = new PrismaClient();
 
@@ -54,7 +56,18 @@ export const getUser = async (_: any, { id }: { id: string }, context: Context) 
     })
   }
 
-  const userFound = await prisma.user.findUnique({ where: { id } })
+  const userFound = await prisma.user.findUnique({ 
+    where: { id },
+    include: {
+      _count: {
+        select: {
+          followers: true,
+          following: true,
+          Post: true
+        }
+      }
+    }
+  })
 
   if (!userFound) {
     throw new GraphQLError('Not found', {
@@ -67,7 +80,7 @@ export const getUser = async (_: any, { id }: { id: string }, context: Context) 
   return userFound
 }
 
-export const login = async (_: any, { email }: { email: string }) => {
+export const login = async (_: any, { email, password }: { email: string, password: string }) => {
   const userFound = await prisma.user.findUnique({ 
     where: { email },
     include: {
@@ -79,6 +92,17 @@ export const login = async (_: any, { email }: { email: string }) => {
       extensions: {
         code: 'NOT_FOUND',
         http: { status: 404 }
+      }
+    })
+  }
+
+  const isCorrect = await bcrypt.compare(password, userFound.password)
+
+  if (!isCorrect) {
+    throw new GraphQLError('Contraseña incorrecta', {
+      extensions: {
+        code: 'BAD_REQUEST',
+        http: { status: 401 }
       }
     })
   }
@@ -162,6 +186,73 @@ export const putUser = async (_: any, { id, username, description, avatar }: { i
 };
 
 export const deleteUser = async (_: any, { id }: { id: string }) => {
+  const userFound = await prisma.user.findUnique({
+    where: { id }
+  })
+
+  if (!userFound) {
+    
+  }
+
+  const postsFound = await prisma.post.findMany({
+    where: {
+      user: {
+        id
+      }
+    },
+    include: {
+      File: true
+    }
+  })
+
+  const avatarPath = userFound.avatar
+  let previewPaths = []
+  let filePaths = []
+
+  postsFound.forEach(post => {
+    previewPaths.push(post.preview)
+    post.File.forEach(file => {
+      filePaths.push(file.file)
+    })
+  })
+
+  if (filePaths.length >= 1) {
+    filePaths.forEach(async file => {
+      const fullPath = path.resolve(`uploads/files/${file}`);
+      // console.log('fullPath: ', fullPath)
+      try {
+        await fs.access(fullPath)
+        await fs.unlink(fullPath)
+      } catch (err) {
+        console.error(`No se pudo eliminar el archivo: ${fullPath}`, err);
+      }
+    })
+  }
+
+  if (previewPaths) {
+    previewPaths.forEach(async preview => {
+      const fullPath = path.resolve(`uploads/preview/${preview}`);
+      // console.log('fullPath: ', fullPath)
+      try {
+        await fs.access(fullPath)
+        await fs.unlink(fullPath)
+      } catch (err) {
+        console.error(`No se pudo eliminar el archivo: ${fullPath}`, err);
+      }
+    })
+  }
+
+  if (avatarPath) {
+    const fullPath = path.resolve(`uploads/avatar/${avatarPath}`);
+    // console.log('fullPath: ', fullPath)
+    try {
+      await fs.access(fullPath)
+      await fs.unlink(fullPath)
+    } catch (err) {
+      console.error(`No se pudo eliminar el archivo: ${fullPath}`, err);
+    }
+  }
+  
   return await prisma.user.delete({
     where: { id },
   });

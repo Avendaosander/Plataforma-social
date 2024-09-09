@@ -4,7 +4,7 @@ import { Context } from "../../types"
 
 const prisma = new PrismaClient()
 
-export const getTechnologies = async (context: Context) => {
+export const getTechnologies = async (_: any, {}, context: Context) => {
 	try {
 		if (!context.auth) {
 			throw new GraphQLError("Not authenticated", {
@@ -15,10 +15,11 @@ export const getTechnologies = async (context: Context) => {
 			})
 		}
 		
-	const technologies = await prisma.technology.findMany()
+		const technologies = await prisma.technology.findMany({})
 
-	return technologies
+		return technologies
 	} catch (error) {
+		console.log(error)
 		if (error instanceof GraphQLError) {
 			// Re-lanzar errores conocidos de GraphQL
 			throw error;

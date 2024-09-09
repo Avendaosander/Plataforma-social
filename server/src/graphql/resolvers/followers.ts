@@ -6,7 +6,7 @@ import { MESSAGE, SUBSCRIPTIONS_EVENTS } from "../../lib/constant.js"
 
 const prisma = new PrismaClient()
 
-export const getFollowers = async (_: any, { idFollowing }: { idFollowing: string }, context: Context) => {
+export const getFollowers = async (_: any, { idFollower }: { idFollower: string }, context: Context) => {
   try {
     if (!context.auth) {
       throw new GraphQLError("Not authenticated", {
@@ -18,7 +18,7 @@ export const getFollowers = async (_: any, { idFollowing }: { idFollowing: strin
     }
 
     const followers = await prisma.follower.findMany({
-      where: { idFollowing }
+      where: { idFollower }
     });
 
     return followers
