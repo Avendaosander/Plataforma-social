@@ -19,8 +19,10 @@
     ],
     "paths": {
       "@/*": ["./*"],
+      "@/store*": ["./app/store*"],
       "@/lib*": ["./app/lib*"],
       "@/graphql*": ["./app/lib/graphql*"],
+      "@/typesGraphql*": ["./app/lib/types/typesGraphql.ts"],
       "@/components*": ["./app/components*"],
       "@/ui*": ["./app/components/ui*"],
       "@/icons*": ["./app/components/icons/icons.ts"],
