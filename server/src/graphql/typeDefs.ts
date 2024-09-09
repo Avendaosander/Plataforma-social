@@ -1,7 +1,7 @@
 export const typeDefs = `#graphql
    type Query {
-      login(email: String!): LoginResponse
-      getUser(id: String!): User
+      login(email: String!, password: String!): LoginResponse
+      getUser(id: String!): UserProfile
       getUsers: [User]
       getPost(id: String!): Post
       getPosts: [PostSummary]
@@ -9,7 +9,7 @@ export const typeDefs = `#graphql
       getPostsFilter(filter: PostFilterInput!): [PostSummary!]!
       getTechnologies: [Technology]
       getComments(id: String!): [CommentsWithData]
-      getFollowers(idFollowing: String!): [Follower]
+      getFollowers(idFollower: String!): [Follower]
       getPostsSaved(idUser: String!): [Post_saved]
    }
 
@@ -53,6 +53,22 @@ export const typeDefs = `#graphql
       password: String
       description: String
       avatar: String
+   }
+
+   type UserProfile {
+      id: String
+      username: String
+      email: String
+      password: String
+      description: String
+      avatar: String
+      _count: CountProfile
+   }
+
+   type CountProfile {
+      followers: Int
+      following: Int
+      Post: Int
    }
 
    type UserInfo {
@@ -106,8 +122,8 @@ export const typeDefs = `#graphql
       title: String
       description: String
       preview: String
-      Files: [File]
-      Comment: [Comment]
+      File: [File]
+      Comment: [CommentsWithData]
       Stack: [Stack]
       saved: Int
       _count: Count
@@ -191,7 +207,9 @@ export const typeDefs = `#graphql
 
    # FILES
    type File {
-      name: String
+      id: String
+      idPost: String
+      file: String
    }
 
    type Count {
