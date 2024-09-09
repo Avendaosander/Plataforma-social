@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Button from './Button'
 import LightIcon from '../icons/LightIcon'
 import MoonIcon from '../icons/MoonIcon';
@@ -15,10 +15,6 @@ function ButtonDarkMode() {
     localStorage.setItem('darkMode', JSON.stringify(newMode));
     document.documentElement.classList.toggle('dark', newMode);
   };
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDarkMode);
-  }, [isDarkMode]);
 
   return (
     <Button
