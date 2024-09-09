@@ -1,5 +1,7 @@
 import ArrowLeft from "./ArrowLeft";
 import BellIcon from "./BellIcon";
+import BookmarkFilled from "./BookmarkFilled";
+import BookmarkPlusIcon from "./BookmarkPlusIcon";
 import BookmarksIcon from "./BookmarksIcon";
 import CheckIcon from "./CheckIcon";
 import ComponentsIcon from "./ComponentsIcon";
@@ -41,6 +43,8 @@ export {
   LightIcon,
   MoonIcon,
   BookmarksIcon,
+  BookmarkFilled,
+  BookmarkPlusIcon,
   LogoutIcon,
   FilterIcon,
   ShareIcon,
