@@ -37,12 +37,6 @@ const imageType = ["image/png", "image/jpg", "image/jpeg", "image/webp", "image/
 // Valida los formatos, el peso y guarda la imagen
 export const upload = multer({
    storage: storage,
-   fileFilter: (req, file, cb) => {
-      if (!imageType.includes(file.mimetype)) {
-         return cb(new Error(`Solamente formatos ${imageType.join(' ')} son permitidos`));
-      }
-      cb(null, true);
-   },
    limits: {
       fileSize: fileSizeRequired,
    },
