@@ -17,10 +17,13 @@ import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import ButtonDarkMode from "./ButtonDarkMode"
 import { signOut } from "next-auth/react"
+import LogoIcon from "../icons/LogoIcon"
+import { useUserStore } from "@/app/store/user"
 
 function Navbar() {
 	const [mainActive, setMainActive] = useState(false)
 	const [notifyOpen, setNotifyOpen] = useState(false)
+	const idUser = useUserStore(state => state.user.id)
 	const pathname = usePathname()
 	const router = useRouter()
 
@@ -62,22 +65,25 @@ function Navbar() {
 			document.removeEventListener("click", handleClickOutsideMain)
 			document.removeEventListener("click", handleClickOutsideNotify)
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [mainActive, notifyOpen])
 
 	return (
-		<section className={`fixed flex gap-5 bg-seagreen-900 dark:bg-transparent ${pathname === '/home/my-profile/settings' ? 'hidden' : ''}`}>
+		<section className={`fixed flex gap-5 bg-seagreen-900 dark:border-r dark:border-white/40 dark:bg-transparent ${pathname === `/home/profile/${idUser}/settings` ? 'hidden' : ''}`}>
 			<div
 				className={`h-screen ${
 					notifyOpen ? "border-r border-white/40 mr-5" : "min-w-52"
 				} flex-grow flex flex-col items-start size justify-between px-3 py-2`}
 			>
-				<Button
-					size='lg'
-					className={`mx-0 px-3 ${widthCondition}`}
-					startContent={<HomeIcon />}
-				>
-					{!notifyOpen && "UVM Dev House"}
-				</Button>
+				<Link href={"/home"}>
+					<Button
+						size='lg'
+						className={`mx-0 px-3 ${widthCondition}`}
+						startContent={<LogoIcon className="size-6"/>}
+					>
+						{!notifyOpen && "UVM Dev House"}
+					</Button>
+				</Link>
 				<nav className={`w-full`}>
 					<ul className='flex flex-col gap-4'>
 						<li>
@@ -96,11 +102,11 @@ function Navbar() {
 							</Link>
 						</li>
 						<li>
-							<Link href={"/home/followers"}>
+							<Link href={"/home?page=followers"}>
 								<Button
 									size='lg'
 									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
-										pathname == "/home/followers"
+										pathname == "/home?page=followers"
 											? "bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
 											: ""
 									}`}
@@ -111,7 +117,7 @@ function Navbar() {
 							</Link>
 						</li>
 						<li>
-							<Link href={"/home/trending"}>
+							<Link href={"/home?page=trending"}>
 								<Button
 									size='lg'
 									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
@@ -131,7 +137,7 @@ function Navbar() {
 									size='lg'
 									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
 										pathname == "/home/search"
-											? "bg-lima-400/30 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
+											? "bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
 											: ""
 									}`}
 									startContent={<SearchIcon />}
@@ -151,11 +157,11 @@ function Navbar() {
 							</Button>
 						</li>
 						<li>
-							<Link href={"/home/my-profile"}>
+							<Link href={`/home/profile/${idUser}`}>
 								<Button
 									size='lg'
 									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
-										pathname == "/home/my-profile"
+										pathname == `/home/profile/${idUser}`
 											? "bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
 											: ""
 									}`}
@@ -175,12 +181,13 @@ function Navbar() {
 						>
 							<ul className='flex flex-col gap-3'>
 								<li>
-									<Link href={'/home/my-profile/settings'}>
+									<Link href={`/home/profile/${idUser}/settings`}>
 										<Button
 											size='lg'
 											className='mx-0 px-3 w-full hover:bg-lima-400/30 dark:hover:bg-biscay-900'
 											shape='none'
 											startContent={<SettingsIcon />}
+											onClick={mainHandle}
 											>
 											Configuraciones
 										</Button>
@@ -188,7 +195,7 @@ function Navbar() {
 								</li>
 								<li>
 									<Link
-										href={"/home/my-profile?bookmarks"}
+										href={`/home/profile/${idUser}?bookmarks`}
 										className='w-full text-start'
 									>
 										<Button
@@ -196,6 +203,7 @@ function Navbar() {
 											className='mx-0 px-3 w-full hover:bg-lima-400/30 dark:hover:bg-biscay-900'
 											shape='none'
 											startContent={<BookmarksIcon />}
+											onClick={mainHandle}
 										>
 											Guardados
 										</Button>
@@ -228,13 +236,13 @@ function Navbar() {
 						}`}
 						startContent={<MenuIcon />}
 					>
-						{!notifyOpen && "Mas"}
+						{!notifyOpen && (mainActive ? "Menos" : "Mas")}
 					</Button>
 				</div>
 			</div>
 			{notifyOpen && (
 				<div
-					className='absolute left-full w-[300px] h-screen bg-seagreen-900 dark:bg-storm-950 text-storm-100 py-2 pr-4 flex flex-col gap-3'
+					className='absolute left-full w-[300px] h-screen bg-seagreen-900 dark:bg-storm-950  text-storm-100  py-2 pr-4 flex flex-col gap-3 border-r border-white/40'
 					id='notify'
 				>
 					<h3 className='text-lg font-semibold'>Notificaciones</h3>
