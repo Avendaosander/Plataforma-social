@@ -5,6 +5,7 @@ import { LOGIN } from "@/app/lib/graphql/users";
 import { print } from "graphql";
 import { NextAuthOptions } from "next-auth";
 import { formatGraphQLErrors } from "@/app/lib/logic";
+import { ResponseLogin } from "@/app/lib/types/typesGraphql";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -24,10 +25,11 @@ export const authOptions: NextAuthOptions = {
             query: print(LOGIN),
             variables: {
               email: credentials.email,
+              password: credentials.password
             },
           });
 
-          const response = await fetch(`${process.env.API_ROUTE}`, {
+          const response = await fetch(`${process.env.API_ROUTE_GRAPHQL}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -35,21 +37,20 @@ export const authOptions: NextAuthOptions = {
             body,
           });
 
-          const { data, errors } = await response.json();
-
+          const { data, errors }: ResponseLogin = await response.json();
+          
           if (errors) {
             const formattedErrors = formatGraphQLErrors(errors);
             throw new Error (`${formattedErrors}`);
           }
 
           const userFound = data.login;
-          // console.log(userFound)
           
           const matchPassword = await bcrypt.compare(credentials.password, userFound.password)
           
           if (!matchPassword) throw new Error ('Contraseña incorrecta')
         
-          console.log(userFound)
+          // console.log(userFound)
           return userFound
         } catch (error:any) {
           throw new Error (error.message);
@@ -58,26 +59,43 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async jwt({ token, user, session }) {
-      // console.log("jwt callback", { token, user, session})
+    async jwt({ token, user, session, trigger }) {
+      // console.log("jwt callback: ", { token, user, session})
+
+      if (trigger === "update" && session?.description) {
+        token.description = session.description
+      }
+
+      if (trigger === "update" && session?.avatar) {
+        token.avatar = session.avatar
+      }
+      
       if (user) {
         return {
           ...token,
           id: user.id,
           username: user.username,
+          avatar: user.avatar,
+          description: user.description,
+          Setting: user.Setting,
+          token: user.token
         }
       }
       return token
     },
     async session({session, token, user}) {
-      // console.log("session callback", { session, token, user})
+      // console.log("session callback: ", { session, token, user})
       return {
         ...session,
         user: {
           ...session.user,
           id: token.id,
-          username: token.username
-        }
+          username: token.username,
+          avatar: token.avatar,
+          description: token.description,
+          Setting: token.Setting
+        },
+        token: token.token
       }
     },
   },
