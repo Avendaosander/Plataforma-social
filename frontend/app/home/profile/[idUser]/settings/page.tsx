@@ -7,6 +7,12 @@ import { usePathname, useRouter } from "next/navigation"
 import Button from "@/app/components/ui/Button"
 import SwitchButton from "@/app/components/ui/SwitchButton"
 import Link from "next/link"
+import { useModalStore } from "@/app/store/modalDelete"
+import { toastCustom } from "@/app/components/ui/toasts"
+import { useMutation } from "@apollo/client"
+import { DELETE_USER } from "@/app/lib/graphql/users"
+import { useUserStore } from "@/app/store/user"
+import { signOut } from "next-auth/react"
 
 const paths = {
   default: '/home/my-profile/settings',
@@ -19,11 +25,40 @@ function Settings() {
 	const [searchText, setSearchText] = useState("")
 	const router = useRouter()
   const pathname = usePathname()
-  console.log(pathname)
+  const idUser = useUserStore(state => state.user.id)
+  const { openModal } = useModalStore(state => state)
+	const [userDelete, { data, loading, error }] = useMutation(DELETE_USER)
+
+	const logout = async () => {
+		const data = await signOut({redirect: false, callbackUrl: '/login'})
+		router.push(data.url)
+	}
+
+  const handleDelete = () => {
+    openModal(
+      'Esta seguro de eliminar esta cuenta?',
+      () => {
+				userDelete({
+					variables: {
+						deleteUserId: idUser
+					}
+				})
+      }
+    )
+  }
+
+	if (!loading && data) {
+		toastCustom({ text: 'Cuenta eliminada', variant: "success", duration: 2000})
+		logout()
+	}
+
+	if (error) {
+		toastCustom({ text: `Hubo un error: ${error}`, variant: "error", duration: 2000 })
+	}
 
   const activeClasses = 'text-biscay-700 font-bold'
 	const goToHome = () => {
-		router.push(`/home/my-profile`)
+		router.push('/home')
 	}
 
 	const handleSubmit = () => {
@@ -51,7 +86,7 @@ function Settings() {
 				/>
 			</section>
 			<div className='flex gap-5 w-full h-full px-2'>
-				<section className='flex flex-col w-64 p-5 bg-white rounded-t-2xl'>
+				<section className='flex flex-col w-64 p-5 bg-white dark:bg-storm-900 rounded-t-2xl'>
 					<Link
 						href='#administrar-cuenta'
 						className={`${pathname === paths.administrar || pathname === paths.default ? activeClasses : 'font-medium'} text-lg`}
@@ -71,7 +106,7 @@ function Settings() {
 						Notificaciones
 					</Link>
 				</section>
-				<section className='flex flex-col gap-3 w-full p-5 bg-white rounded-t-2xl text-lg'>
+				<section className='flex flex-col gap-3 w-full p-5 bg-white dark:bg-storm-900 rounded-t-2xl text-lg'>
 					<h4
 						className='text-xl font-bold'
 						id='administrar-cuenta'
@@ -88,6 +123,7 @@ function Settings() {
 								size='sm'
 								shape='sm'
 								className='px-3 py-1'
+								onClick={() => handleDelete()}
 							>
 								Eliminar
 							</Button>
