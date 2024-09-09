@@ -1,0 +1,1 @@
+export type pathsUploads = 'avatar' | 'preview' | 'files' 
