@@ -1,44 +1,48 @@
 'use client'
 import React, { useState } from "react"
-import { useRouter } from "next/navigation"
-import { PlusIcon, SearchIcon } from "@/icons/icons"
+import { PlusIcon } from "@/icons/icons"
 import Button from "@/ui/Button"
-import InputWithIcon from "@/ui/InputWithIcon"
 import CardPost from "@/ui/CardPost"
+import InputSearch from "@/app/components/ui/InputSearch"
+import Link from "next/link"
+import { useQuery } from "@apollo/client"
+import { GetFollower, GetPosts } from "@/app/lib/types/typesGraphql"
+import { GET_POSTS } from "@/app/lib/graphql/posts"
+import { useUserStore } from "@/app/store/user"
+import { GET_FOLLOWERS } from "@/app/lib/graphql/followers"
 
-function Search() {
-  const [searchText, setSearchText] = useState('')
+function Search({
+  searchParams
+}: {
+  searchParams?: {
+    query?: string,
+  }
+}) {
+	const { data: posts, loading, error } = useQuery<GetPosts>(GET_POSTS)
+	const { user } = useUserStore(state => state)
+	const { data: followers } = useQuery<GetFollower>(GET_FOLLOWERS, {
+    variables: {
+      idFollower: user.id
+    }
+  })
   const [isFilterActive, setIsFilterActive] = useState(false)
-
-  const router = useRouter();
+  // console.log(searchParams)
 
   const handleFilterState = () => {
     setIsFilterActive(!isFilterActive)
   }
 
-  const handleSubmit = () =>{  
-    router.push(`/home/search?query=${encodeURIComponent(searchText)}`);
-  }
-
 	return (
 		<>
 			<section className='flex flex-col items-center w-full gap-5'>
-				<InputWithIcon
-					type='text'
-					placeholder='Buscar'
-          value={searchText}
-          onChange={e=>setSearchText(e.target.value)}
-					endContent={<SearchIcon className='size-5' />}
-          onSubmit={handleSubmit}
-				/>
-				<CardPost/>
-				<CardPost/>
-				<CardPost/>
-				<CardPost/>
+				<InputSearch/>
+        {followers?.getFollowers && posts?.getPosts.map(post => (
+          <CardPost key={post.id} post={post} following={followers.getFollowers.some(follower => follower.idFollowing == post.user.id)}/>
+        ))}
 			</section>
       <section className={`fixed top-0 right-0 h-screen max-w-[250px] flex flex-col justify-between items-center py-5 px-5 gap-2`}>
         <Button
-          className='px-3'
+          className='px-3 ml-auto'
           color={`${isFilterActive ? 'secondary' : 'primary'}`}
           startContent={<PlusIcon />}
           onClick={handleFilterState}
@@ -54,16 +58,18 @@ function Search() {
                 <option value="React">React</option>
               </select>
               <p className="text-lg font-medium">Categorias</p>
-              <p className="text-lg font-medium">Clasificacion</p>
+              <p className="text-lg font-medium">Calificacion</p>
             </>
           )}
         </div>
-        <Button
-          className='px-3'
-          startContent={<PlusIcon />}
-        >
-          Crear
-        </Button>
+        <Link href={'/home/create'} className="ml-auto">
+          <Button
+            className='px-3'
+            startContent={<PlusIcon />}
+          >
+            Crear
+          </Button>
+        </Link>
       </section>
 		</>
 	)
