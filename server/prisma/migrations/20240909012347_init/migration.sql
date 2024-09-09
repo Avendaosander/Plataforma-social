@@ -142,10 +142,10 @@ ALTER TABLE `Rating` ADD CONSTRAINT `Rating_idPost_fkey` FOREIGN KEY (`idPost`) 
 ALTER TABLE `Rating` ADD CONSTRAINT `Rating_idUser_fkey` FOREIGN KEY (`idUser`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Follower` ADD CONSTRAINT `Follower_idFollower_fkey` FOREIGN KEY (`idFollower`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Follower` ADD CONSTRAINT `Follower_idFollower_fkey` FOREIGN KEY (`idFollower`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Follower` ADD CONSTRAINT `Follower_idFollowing_fkey` FOREIGN KEY (`idFollowing`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Follower` ADD CONSTRAINT `Follower_idFollowing_fkey` FOREIGN KEY (`idFollowing`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `File` ADD CONSTRAINT `File_idPost_fkey` FOREIGN KEY (`idPost`) REFERENCES `Post`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

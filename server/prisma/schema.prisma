@@ -95,10 +95,10 @@ model Rating {
 }
 
 model Follower {
-  follower   User   @relation("UserFollowers", fields: [idFollower], references: [id])
+  follower   User   @relation("UserFollowers", fields: [idFollower], references: [id], onDelete: Cascade)
   idFollower String
 
-  following   User   @relation("UserFollowing", fields: [idFollowing], references: [id])
+  following   User   @relation("UserFollowing", fields: [idFollowing], references: [id], onDelete: Cascade)
   idFollowing String
 
   @@id([idFollower, idFollowing])
