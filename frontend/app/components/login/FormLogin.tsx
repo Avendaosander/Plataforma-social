@@ -10,7 +10,6 @@ import { Toaster } from "react-hot-toast"
 
 function FormLogin() {
 	const { status } = useSession()
-	const [error, setError] = useState<null | string>(null)
 	const [login, setLogin] = useState({
 		email: "",
 		password: ""
@@ -32,11 +31,11 @@ function FormLogin() {
 	const handleSubmit = async(e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		if (login.email === '') {
-			return toastCustom({text: 'Debe ingresar un correo electronico', variant: "error"})
+			return toastCustom({text: 'Debe ingresar un correo electronico', variant: "error", duration: 2000})
 		}
 
 		if (login.password === '') {
-			return toastCustom({text: 'Debe ingresar una contraseña', variant: "error"})
+			return toastCustom({text: 'Debe ingresar una contraseña', variant: "error", duration: 2000})
 		}
 			
     const res = await signIn('credentials', {
@@ -45,10 +44,10 @@ function FormLogin() {
       redirect: false
     })
 
-		console.log(res)
+		// console.log('Respuesta: ', res)
+
     if (res?.error) {
-      setError(res.error)
-			toastCustom({text: res.error, variant: "error"})
+			toastCustom({text: res.error, variant: "error", duration: 2000})
     } 
 	}
 

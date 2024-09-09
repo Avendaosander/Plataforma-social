@@ -8,26 +8,28 @@ import { useMutation } from "@apollo/client"
 import { useRouter } from "next/navigation"
 import { toastCustom } from "../ui/toasts"
 import { Toaster } from "react-hot-toast"
+import { PostUserVariables, ResponseRegister } from "@/app/lib/types/typesGraphql"
 
 function FormRegister() {
   const router = useRouter()
-	const [postUser, {data, loading, error, reset}] = useMutation(POST_USER)
+	const [postUser, {data, loading, error, reset}] = useMutation<ResponseRegister, PostUserVariables>(POST_USER)
 	const [register, setRegister] = useState({
 		username: "",
 		email: "",
 		password: ""
 	})
   const [confirmPassword, setConfirmPassword] = useState('')
-	console.log(data)
-	console.log(loading)
+	// console.log(data)
+	// console.log(loading)
 
 	if (error) {
 		console.log(error.message)
-		toastCustom({text: error.message, variant: "error"})
+		toastCustom({text: error.message, variant: "error", duration: 2000})
 		reset()
 	}
-	
+
 	if (data?.postUser) {
+		toastCustom({text: "Usuario registrado correctamente", variant: "success", duration: 2000})
 		router.push('/login')
 	}
 
@@ -44,6 +46,10 @@ function FormRegister() {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 		
+		if (register.username === '') {
+			return toastCustom({text: 'Debe ingresar un nombre de usuario', variant: "error"})
+		}
+
 		if (register.email === '') {
 			return toastCustom({text: 'Debe ingresar un correo electronico', variant: "error"})
 		}
