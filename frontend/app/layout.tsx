@@ -22,7 +22,7 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html lang='en' className="scroll-smooth">
+		<html lang='en' className="scroll-smooth scrollbar-thin scrollbar-track-inherit scrollbar-thumb-seagreen-950">
 			<body
 				className={clsx(
 					inter.className,
