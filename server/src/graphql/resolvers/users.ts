@@ -19,7 +19,16 @@ export const getUsers = async (_: any, {}, context: Context) => {
 			})
 		}
 
-    return await prisma.user.findMany()
+    return await prisma.user.findMany({
+      include: {
+        _count: {
+          select: {
+            following: true,
+            Post: true
+          }
+        }
+      }
+    })
 
 	} catch (error) {
     if (error instanceof GraphQLError) {

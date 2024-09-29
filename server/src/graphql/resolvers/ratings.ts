@@ -35,7 +35,7 @@ export const postRating = async (
       })
     }
 
-    const nweRating = await prisma.rating.create({
+    const newRating = await prisma.rating.create({
       data: {
         idPost,
         idUser,
@@ -43,7 +43,7 @@ export const postRating = async (
       }
     })
 
-    return nweRating
+    return newRating
   } catch (error) {
     if (error instanceof GraphQLError) {
       // Re-lanzar errores conocidos de GraphQL

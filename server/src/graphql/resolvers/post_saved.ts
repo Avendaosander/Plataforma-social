@@ -18,6 +18,11 @@ export const getPostsSaved = async (_: any, { idUser }: { idUser: string }, cont
     const posts = await prisma.post_saved.findMany({
       where: { idUser },
       include: {
+        user: {
+          select: {
+            id: true
+          }
+        },
         post: {
           include: {
             user: true,
@@ -26,13 +31,65 @@ export const getPostsSaved = async (_: any, { idUser }: { idUser: string }, cont
                 tech: true
               }
             },
+            _count: {
+              select: {
+                Comment: true,
+                Post_saved: true
+              }
+            },
             File: true,
           }
         }
       }
     });
 
-    return posts
+    const postsWithDetails = await Promise.all(
+			posts.map(async (post) => {
+				const averageRating = await prisma.rating.aggregate({
+					where: {
+						idPost: post.post.id,
+					},
+					_avg: {
+						rating: true
+					}
+				})
+
+				const isSaved = await prisma.post_saved.findUnique({
+					where: {
+						idPost_idUser: {
+							idPost: post.post.id,
+							idUser: context.id,
+						},
+					},
+				})
+
+        const isFollowing = await prisma.follower.findUnique({
+					where: {
+						idFollower_idFollowing: {
+							idFollower: context.id,
+							idFollowing: post.post.idUser,
+						},
+					},
+				})
+        console.log(isFollowing)
+        
+        const postFormated = {
+          ...post.post,
+					comments: post.post._count.Comment,
+					saved: post.post._count.Post_saved,
+					rating: averageRating._avg.rating || 0,
+					isFollowing: !!isFollowing,
+					isSaved: !!isSaved,
+
+        }
+				return {
+					...post,
+          post: postFormated
+				};
+			})
+		);
+		
+		return postsWithDetails
   } catch (error) {
     if (error instanceof GraphQLError) {
       // Re-lanzar errores conocidos de GraphQL
@@ -157,7 +214,7 @@ export const deletePostSaved = async (_: any, {idUser, idPost}: {idUser: string,
       }
     });
 
-    return { message: "Unsaved successfully" };
+    return { id: idPost }
 
   } catch (error) {
     if (error instanceof GraphQLError) {

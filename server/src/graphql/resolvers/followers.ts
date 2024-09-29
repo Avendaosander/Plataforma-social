@@ -48,8 +48,6 @@ export const getFollowers = async (_: any, { idFollower }: { idFollower: string 
 
 export const postFollower = async (_: any, {idFollower, idFollowing}: {idFollower: string, idFollowing: string}, context: Context) => {
   try {
-    console.log(idFollower)
-    console.log(idFollowing)
     if (!context.auth) {
       throw new GraphQLError("Not authenticated", {
         extensions: {
@@ -93,11 +91,11 @@ export const postFollower = async (_: any, {idFollower, idFollowing}: {idFollowe
 			id: idFollowing,
 			username: follower.follower.username,
 			message: MESSAGE.NEW_FOLLOWER,
+      link: `${process.env.FRONTEND_URL}home/profile/${follower.idFollower}`
 		})
 
     return follower
   } catch (error) {
-    console.log(error)
     if (error instanceof GraphQLError) {
       // Re-lanzar errores conocidos de GraphQL
       throw error;

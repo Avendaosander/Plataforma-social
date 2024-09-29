@@ -74,6 +74,15 @@ export const postComment = async (_: any, { idPost, idUser, text }: { idPost: st
         idUser,
         idPost,
         text
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            avatar: true,
+            username: true
+          }
+        }
       }
     })
   
