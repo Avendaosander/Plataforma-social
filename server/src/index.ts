@@ -18,6 +18,7 @@ import { insertTechs } from "./helpers/insertData.js"
 import { Context, Token } from "./types.js"
 import router from "./routes/uploads.js"
 import { defaultData } from "./helpers/insertDefaultData.js"
+import { notification } from "./routes/notifications.js"
 await insertTechs()
 await defaultData()
 
@@ -70,6 +71,7 @@ const main = async () => {
 	app.use(morgan("dev"))
 	app.use(cors())
 
+	app.use("/subscription", notification)
 	app.use("/uploads", router)
 	app.use(
 		"/graphql",
