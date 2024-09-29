@@ -1,6 +1,6 @@
 import { deleteUser, getUser, getUsers, login, postUser, putUser } from "./users.js"
 import { deleteFollower, getFollowers, postFollower } from "./followers.js"
-import { deletePost, getPost, getPosts, getPostsFilter, getPostsUser, postPost, putPost } from "./posts.js"
+import { deletePost, getPost, getPosts, getPostsFilter, getPostsFollowings, getPostsUser, postPost, putPost } from "./posts.js"
 import { getTechnologies } from "./technologhy.js"
 import { deleteComment, getComments, postComment } from "./comments.js"
 import { deleteRating, postRating, putRating } from "./ratings.js"
@@ -17,6 +17,7 @@ export const resolvers = {
 		getUsers,
 		getPost,
 		getPosts,
+		getPostsFollowings,
 		getPostsUser,
 		getPostsFilter,
 		getTechnologies,
