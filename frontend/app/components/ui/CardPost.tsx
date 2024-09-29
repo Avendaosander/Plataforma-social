@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
 import { useMutation, useQuery } from "@apollo/client"
-import { PostFollower, DataPosts, DeleteFollower } from "@/typesGraphql"
+import { PostFollower, DataPosts, DeleteFollower, postPostSaved, deletePostSaved, PostSavedInput } from "@/typesGraphql"
 import { getTimeElapsed, truncateText } from "@/app/lib/logic"
 import Button from "./Button"
 import {
@@ -22,34 +22,25 @@ import {
 } from "@/app/lib/graphql/followers"
 import { GET_USER } from "@/app/lib/graphql/users"
 import ButtonBookmark from "./ButtonBookmark"
+import { DELETE_POST_SAVED, POST_POST_SAVED } from "@/app/lib/graphql/posts_saveds"
+import RatingStars from "./RatingStars"
+import { useFilterSearchStore } from "@/app/store/filterSearch"
 
 interface PropsCardPost {
 	post: DataPosts
-	following?: boolean
 	hiddenButton?: boolean
+	handleFollowing: (idUser: string, isFollowing: boolean) => void
+	handleSaved: (idPost: string, isSaved: boolean, saved: number) => void
 }
 
 function CardPost({
 	post,
-	following = false,
-	hiddenButton = false
+	hiddenButton = false,
+	handleFollowing,
+	handleSaved
 }: PropsCardPost) {
-	const [isFollowing, setIsFollowing] = useState(following)
 	const { data: sessionData } = useSession()
-	const idUser = localStorage.getItem("idUser")
-
-	const { refetch: refetchGetfollowers } = useQuery(GET_FOLLOWERS, {
-		variables: { idFollower: idUser },
-		skip: true
-	})
-	const { refetch: refetchGetUser } = useQuery(GET_USER, {
-		variables: { id: idUser },
-		skip: true
-	})
-	const { refetch: refetchGetUserFollow } = useQuery(GET_USER, {
-		variables: { id: post.user.id },
-		skip: true
-	})
+	const setFilter = useFilterSearchStore(state => state.setFilterSearh)
 
 	const [postFollower, { data: followers, error: errorFollowers }] =
 		useMutation<PostFollower>(POST_FOLLOWER)
@@ -57,9 +48,16 @@ function CardPost({
 	const [deleteFollower, { data: follower, error: errorFollower }] =
 		useMutation<DeleteFollower>(DELETE_FOLLOWER)
 
+	const [postPostSaved, { data: postSaved, error: errorPostSaved }] =
+		useMutation<postPostSaved,PostSavedInput>(POST_POST_SAVED)
+
+	const [deletePostSaved, { data: postSavedDeleted, error: errorPostSavedDelete }] =
+		useMutation<deletePostSaved,PostSavedInput>(DELETE_POST_SAVED)
+
 	const isAuthor = sessionData?.user.id === post.user.id
-	const handleFollowing = async () => {
-		if (isFollowing) {
+
+	const handleFetchFollowing = async () => {
+		if (post.isFollowing) {
 			const res = await deleteFollower({
 				variables: {
 					idFollower: sessionData?.user.id,
@@ -68,10 +66,7 @@ function CardPost({
 			})
 
 			if (res.data?.deleteFollower) {
-				setIsFollowing(false)
-				await refetchGetfollowers()
-				await refetchGetUser()
-				await refetchGetUserFollow()
+				handleFollowing(post.user.id, false)
 			}
 		} else {
 			const res = await postFollower({
@@ -82,10 +77,33 @@ function CardPost({
 			})
 
 			if (res.data?.postFollower) {
-				setIsFollowing(true)
-				await refetchGetfollowers()
-				await refetchGetUser()
-				await refetchGetUserFollow()
+				handleFollowing(post.user.id, true)
+			}
+		}
+	}
+
+	const handleFetchPostSaved = async () => {
+		if (post.isSaved) {
+			const res = await deletePostSaved({
+				variables: {
+					idPost: post.id,
+					idUser: sessionData?.user.id as string
+				}
+			})
+			
+			if (res.data?.deletePostSaved) {
+				handleSaved(post.id, false, post.saved - 1)
+			}
+		} else {
+			const res = await postPostSaved({
+				variables: {
+					idPost: post.id,
+					idUser: sessionData?.user.id as string
+				}
+			})
+
+			if (res.data?.postPostSaved) {
+				handleSaved(post.id, true, post.saved + 1)
 			}
 		}
 	}
@@ -115,25 +133,25 @@ function CardPost({
 					</Link>
 					{!isAuthor &&
 						!hiddenButton &&
-						(isFollowing ? (
-							<Button
-								variant='solid'
-								color='primary'
-								shape='md'
-								size='md'
-								className='px-3 py-0.5'
-								onClick={handleFollowing}
-							>
-								Siguiendo
-							</Button>
-						) : (
+						(post.isFollowing ? (
 							<Button
 								variant='outline'
 								color='primary'
 								shape='md'
 								size='md'
 								className='px-3 py-0.5 dark:bg-inherit dark:ring-white dark:text-white'
-								onClick={handleFollowing}
+								onClick={handleFetchFollowing}
+							>
+								Siguiendo
+							</Button>
+						) : (
+							<Button
+								variant='solid'
+								color='primary'
+								shape='md'
+								size='md'
+								className='px-3 py-0.5'
+								onClick={handleFetchFollowing}
 							>
 								Seguir
 							</Button>
@@ -155,6 +173,7 @@ function CardPost({
 								<Link
 									key={tech.idTechnology}
 									href={`/home/search?query=${tech.tech.name}`}
+									onClick={() => setFilter(['technology', 'rating'])}
 								>
 									<Button
 										variant='flat'
@@ -194,21 +213,17 @@ function CardPost({
 			</div>
 			<footer className='border-t border-seagreen-950/40 dark:border-white/40 flex justify-between px-3 pt-3'>
 				<div className='flex gap-1 items-center'>
-					<div className='flex gap-1'>
-						<StarIcon className='size-5 fill-yellow-400 stroke-yellow-400' />
-						<StarIcon className='size-5 fill-yellow-400 stroke-yellow-400' />
-						<StarIcon className='size-5 fill-yellow-400 stroke-yellow-400' />
-						<StarIcon className='size-5 ' />
-						<StarIcon className='size-5 ' />
-					</div>
-					<p className='font-light'>3.2</p>
+					<RatingStars rating={post.rating}/>
 				</div>
 				<div className='flex gap-1 items-center'>
 					<MessageIcon className='size-5' />
 					<p className='font-light'>{post.comments}</p>
 				</div>
 				<ShareIcon className='size-5' />
-				<ButtonBookmark idUser={idUser as string} idPost={post.id} isSaved={false}/>
+				<div className='flex gap-1 items-center'>
+					<p className='font-light'>{post.saved}</p>
+					<ButtonBookmark isSaved={post.isSaved} handlePostSaved={handleFetchPostSaved}/>
+				</div>
 			</footer>
 		</article>
 	)
