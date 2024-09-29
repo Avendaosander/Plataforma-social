@@ -2,13 +2,12 @@ import React from 'react'
 import { BookmarkFilled, BookmarkPlusIcon } from '@/icons'
 
 interface ButtonBookmarkProps {
-  idUser: string
-  idPost: string
   isSaved: boolean
+  handlePostSaved: () => void
 }
-function ButtonBookmark({ idUser, idPost, isSaved }: ButtonBookmarkProps) {
+function ButtonBookmark({ isSaved, handlePostSaved }: ButtonBookmarkProps) {
   return (
-    <button className='flex' onClick={() => {}}>
+    <button className='flex' onClick={() => {handlePostSaved()}}>
       {isSaved ? (
         <BookmarkFilled className='size-5 text-lima-400'/>
       ) : (

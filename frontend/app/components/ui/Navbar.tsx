@@ -19,6 +19,9 @@ import ButtonDarkMode from "./ButtonDarkMode"
 import { signOut } from "next-auth/react"
 import LogoIcon from "../icons/LogoIcon"
 import { useUserStore } from "@/app/store/user"
+import { useSubscription } from "@apollo/client"
+import { NEW_FOLLOWER } from "@/app/lib/graphql/subscriptions"
+import { WSNewFollower } from "@/app/lib/types/typesGraphql"
 
 function Navbar() {
 	const [mainActive, setMainActive] = useState(false)
@@ -26,6 +29,11 @@ function Navbar() {
 	const idUser = useUserStore(state => state.user.id)
 	const pathname = usePathname()
 	const router = useRouter()
+	useSubscription<WSNewFollower>(NEW_FOLLOWER,{
+		onData: ({ data }) => {
+			console.log(data.data?.newFollower)
+		}
+	})
 
 	const widthCondition = notifyOpen ? "w-auto h-11" : "w-full"
 	const notifyClasses = `mx-0 px-3 ${
@@ -102,11 +110,11 @@ function Navbar() {
 							</Link>
 						</li>
 						<li>
-							<Link href={"/home?page=followers"}>
+							<Link href={"/home/followers"}>
 								<Button
 									size='lg'
 									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
-										pathname == "/home?page=followers"
+										pathname == "/home/followers"
 											? "bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
 											: ""
 									}`}
@@ -195,7 +203,7 @@ function Navbar() {
 								</li>
 								<li>
 									<Link
-										href={`/home/profile/${idUser}?bookmarks`}
+										href={`/home/profile/${idUser}?filter=postsSaved`}
 										className='w-full text-start'
 									>
 										<Button

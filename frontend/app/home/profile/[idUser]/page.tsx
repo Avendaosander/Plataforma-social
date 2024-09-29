@@ -36,7 +36,8 @@ function Profile({ params }: { params: { idUser: string } }) {
 	} = useQuery<DataUserProfile>(GET_USER, {
 		variables: {
 			id: params.idUser
-		}
+		},
+		fetchPolicy: 'cache-and-network'
 	})
 
 	const { data: followers, loading: loadingFollowers } = useQuery<GetFollower>(GET_FOLLOWERS, {

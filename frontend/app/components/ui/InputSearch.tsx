@@ -40,11 +40,13 @@ function InputSearch() {
   
   return (
     <InputWithIcon
+      text={search}
+      setText={setSearch}
       type='text'
       placeholder='Buscar'
       name='Search'
       value={search}
-      onChange={e=>handleSearch(e.target.value)}
+      handleChange={handleSearch}
       onSubmit={handleSubmit}
       endContent={<SearchIcon className='size-5'/>}
     />
