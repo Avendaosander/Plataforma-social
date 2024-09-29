@@ -51,7 +51,7 @@ export const defaultData = async () => {
 
 			const posts = usersCreated.flatMap((user) => {
 				// Generar un número aleatorio de publicaciones entre 2 y 10 para cada usuario
-				const numberOfPosts = Math.floor(Math.random() * (10 - 2 + 1)) + 2;
+				const numberOfPosts = Math.floor(Math.random() * (5 - 2 + 1)) + 2;
 
 				return Array.from({ length: numberOfPosts }, () => {
 					const postName = `post${postCounter}`; // Generar nombre único para cada post
@@ -82,7 +82,7 @@ export const defaultData = async () => {
 
       const stacks = postsCreated.flatMap((post) => {
         // Generar un número aleatorio de tecnologías entre 1 y 4 para cada publicación
-        const numberOfTechnologies = Math.floor(Math.random() * (4 - 1 + 1)) + 1;
+        const numberOfTechnologies = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
         
         // Seleccionar tecnologías aleatorias
         const selectedTechnologies = getRandomItems(technologies, numberOfTechnologies);
@@ -101,7 +101,7 @@ export const defaultData = async () => {
       // Generar comentarios
       const comments = postsCreated.flatMap((post) => {
         // Seleccionar al menos 5 usuarios para comentar en cada publicación
-        const selectedUsers = getRandomItems(usersCreated, Math.min(5, usersCreated.length));
+        const selectedUsers = getRandomItems(usersCreated, Math.min(4, usersCreated.length));
 
         return selectedUsers.map((user, index) => ({
           idPost: post.id,

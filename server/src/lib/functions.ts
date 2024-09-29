@@ -1,4 +1,5 @@
 import { pubsub } from "../graphql/resolvers/index.js"
+import webpush from "../helpers/webPush.js"
 
 type wsPublishTypes = {
   subscriptionName: string
@@ -6,6 +7,7 @@ type wsPublishTypes = {
   id: string
   username: string
   message: string
+  link: string
   text?: string
 }
 
@@ -15,12 +17,23 @@ export const wsPublish = async ({
   username,
   message,
   text,
-  payloadName
+  payloadName,
+  link
 }: wsPublishTypes) => {
+  const textFormated = text ? `${username} ${message} ${text}` : `${username} ${message}`
+  
+  const payload = JSON.stringify({
+    title: 'UVMDev Notification',
+    message: textFormated,
+    url: link
+  })
+
+  // webpush.sendNotification(pushSubscription, payload)
   pubsub.publish(subscriptionName, {
     [payloadName]: {
       id,
-      text: `${username} ${message} ${text}`,
+      text: textFormated,
+      link
     }
   })
 }
