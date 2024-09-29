@@ -1,6 +1,6 @@
 "use client"
 
-import { ApolloLink, HttpLink } from "@apollo/client"
+import { ApolloLink, HttpLink, split } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
 import {
 	ApolloClient,
@@ -8,6 +8,9 @@ import {
 	InMemoryCache,
 	SSRMultipartLink
 } from "@apollo/experimental-nextjs-app-support"
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { createClient } from 'graphql-ws';
+import { getMainDefinition } from "@apollo/client/utilities";
 
 function makeClient() {
   const authLink = setContext((_, { headers }) => {
@@ -26,9 +29,27 @@ function makeClient() {
     fetchOptions: { cache: "no-store" }
 	})
 
+	const wsLink = new GraphQLWsLink(
+		createClient({
+			url: 'ws://localhost:4000/graphql',
+		})
+	)
+
+	const splitLink = split(
+		({ query }) => {
+			const definition = getMainDefinition(query);
+			return (
+				definition.kind === 'OperationDefinition' && 
+				definition.operation === 'subscription'
+			)
+		},
+		wsLink,
+		authLink.concat(httpLink),
+	);
+
 	return new ApolloClient({
 		cache: new InMemoryCache(),
-		link: authLink.concat(httpLink),
+		link: splitLink,
 		name: "Plataforma Social",
 		version: "1.0"
 	})
