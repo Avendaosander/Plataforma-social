@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import React, { useEffect } from 'react'
 import { useUserStore } from '@/store/user';
 import { LoginClass } from '@/typesGraphql';
+import { subscription } from './webpush/wp';
 
 function SessionProvider({children}: React.PropsWithChildren) {
   const { data: sessionData, status } = useSession()
@@ -24,6 +25,12 @@ function SessionProvider({children}: React.PropsWithChildren) {
       localStorage.setItem('idUser', sessionData.user.id)
     }
   }, [sessionData, status, updateState]);
+  
+  useEffect(() => {
+    if (sessionData) {
+      subscription(sessionData.user.id)
+    }
+  }, [])
   
   return (
     <div>{children}</div>
