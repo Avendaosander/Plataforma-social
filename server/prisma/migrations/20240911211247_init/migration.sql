@@ -4,6 +4,7 @@ CREATE TABLE `User` (
     `email` VARCHAR(191) NOT NULL,
     `username` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
+    `recoveryCode` VARCHAR(191) NOT NULL DEFAULT '',
     `description` VARCHAR(191) NOT NULL DEFAULT '',
     `avatar` VARCHAR(191) NOT NULL DEFAULT '',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
