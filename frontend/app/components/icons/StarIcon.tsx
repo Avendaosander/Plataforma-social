@@ -1,6 +1,10 @@
 import React from "react"
 
-function StarIcon({ className } : { className?: string}) {
+interface StarIconProps extends React.SVGProps<SVGSVGElement> {
+  className?: string;
+}
+
+function StarIcon({ className, ...props } : StarIconProps) {
 	return (
 		<svg
       className={className}
@@ -12,6 +16,7 @@ function StarIcon({ className } : { className?: string}) {
 			strokeWidth='1.5'
 			strokeLinecap='round'
 			strokeLinejoin='round'
+			{...props}
 		>
 			<path
 				stroke='none'
