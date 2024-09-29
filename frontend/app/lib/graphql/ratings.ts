@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const POST_RATING = gql`
-  mutation PostRating($idPost: String!, $idUser: String!, $data: RatingInput!) {
-    postRating(idPost: $idPost, idUser: $idUser, data: $data) {
+  mutation PostRating($idPost: String!, $idUser: String!, $rating: Float!) {
+    postRating(idPost: $idPost, idUser: $idUser, rating: $rating) {
       idPost
       idUser
       rating
@@ -16,8 +16,8 @@ export const POST_RATING = gql`
 `
 
 export const PUT_RATING = gql`
-  mutation PutRating($idPost: String!, $idUser: String!, $data: RatingInput!) {
-    putRating(idPost: $idPost, idUser: $idUser, data: $data) {
+  mutation PutRating($idPost: String!, $idUser: String!, $rating: Float!) {
+    putRating(idPost: $idPost, idUser: $idUser, rating: $rating) {
       idPost
       idUser
       rating

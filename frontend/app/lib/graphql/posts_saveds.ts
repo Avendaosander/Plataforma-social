@@ -16,13 +16,6 @@ export const GET_POSTS_SAVED = gql`
         title
         description
         preview
-        Comment {
-          id
-          idPost
-          idUser
-          text
-          createdAt
-        }
         Stack {
           idPost
           idTechnology
@@ -35,6 +28,9 @@ export const GET_POSTS_SAVED = gql`
         _count {
           Post_saved
         }
+        rating
+        isFollowing
+        isSaved
         createdAt
       }
       idUser

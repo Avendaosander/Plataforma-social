@@ -16,6 +16,10 @@ export interface ApolloResponseError {
 	extraInfo?: any
 }
 
+export type ResponseID = {
+	id: string
+}
+
 // USER
 export interface UserBase {
 	id: string
@@ -54,6 +58,10 @@ export type UserInfo = {
 	id: string
 	username: string
 	avatar: string
+}
+
+export type GetUsers = {
+	getUsers: GetUserProfile[]
 }
 
 // LOGIN
@@ -128,10 +136,14 @@ export interface Posts {
 	comments: number
 	saved: number
 	Stack: Stack[]
+	isSaved: boolean
+	rating: number
+	isFollowing: boolean
 	createdAt: number
 }
 
-export interface DataPosts extends Omit<Posts, "comment" | "saved"> {}
+export interface DataPosts extends Omit<Posts, "comment"> {}
+
 export type DataPostSaved = {
 	idPost: string
 	idUser: string
@@ -139,8 +151,26 @@ export type DataPostSaved = {
 	user:	UserInfo
 }
 
+export type PostSaved = {
+	idPost: string
+	idUser: string
+}
+
 export type GetPosts = {
-	getPosts: DataPosts[]
+	getPosts: PaginationData
+}
+
+export type PaginationData = {
+	posts: DataPosts[],
+	cursor: string
+}
+
+export type GetPostsFollowings = {
+	getPostsFollowings: DataPosts[]
+}
+
+export type GetPostsFilter = {
+	getPostsFilter: DataPosts[]
 }
 
 export type GetPostsUser = {
@@ -149,6 +179,19 @@ export type GetPostsUser = {
 
 export type GetPostsSaved = {
 	getPostsSaved: DataPostSaved[]
+}
+
+export type postPostSaved = {
+	postPostSaved: PostSaved[]
+}
+
+export type deletePostSaved = {
+	deletePostSaved: PostSaved[]
+}
+
+export type PostSavedInput = {
+	idPost: string
+	idUser: string
 }
 
 export type Stack = {
@@ -161,12 +204,20 @@ export type Tech = {
 	name: string;
 }
 
-
 export type PostPostVariables = {
 	title: string
 	description: string
 	technologies: GetTechnology[]
 	newTechnologies?: NewTechnology[]
+}
+
+export type PutPostVariables = {
+	putPostId: string
+	title?: string
+	description?: string
+	technologies?: GetTechnology[]
+	newTechnologies?: NewTechnology[]
+	filesDelete?: File[]
 }
 
 export interface PostPost extends Omit<Post, "comment" | "saved" | "stack"> {}
@@ -175,10 +226,13 @@ export type ResponsePostPost = {
 	postPost: PostPost
 }
 
+export type PutPost = {
+	putPost: Post
+}
+
 export type NewTechnology = {
 	name: string
 }
-
 
 export type GetPost = {
 	data: DataPost;
@@ -199,6 +253,9 @@ export type Post = {
 	saved:       null;
 	createdAt:   number;
 	_count:      CountPost;
+	isSaved: 		 boolean
+	rating: 		 number
+	myRating:		 Rating
 	File:				 File[]
 }
 
@@ -215,6 +272,7 @@ export type StackSummary = {
 }
 
 export type CountPost = {
+	Rating: number;
 	Post_saved: number;
 }
 
@@ -243,6 +301,16 @@ export type Comment = {
 	createdAt: string;
 }
 
+export type CommentInput = {
+	idPost:    string;
+	idUser:    string;
+	text:      string;
+}
+
+export type PostComment = {
+	postComment: CommentsWithData
+}
+
 export type CommentsWithData = {
 	id: string
 	idPost: string
@@ -251,4 +319,40 @@ export type CommentsWithData = {
 	user: UserInfo
 	text:    string
 	createdAt: string
+}
+
+export type PostRating = {
+	postRating: Rating
+}
+
+export type PutRating = {
+	putRating: Rating
+}
+
+export type DeleteRating = {
+	deleteRating: Rating
+}
+
+export type Rating = {
+	idPost: string
+	idUser: string
+	rating: number
+}
+
+export type RatingInputDelete = {
+	idPost: string
+	idUser: string
+}
+
+
+// SUBSCRIPTIONS
+
+export type SubscriptionData = {
+	id: string
+	text: string
+	link: string
+}
+
+export type WSNewFollower = {
+	newFollower: SubscriptionData
 }

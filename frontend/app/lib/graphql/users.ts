@@ -50,6 +50,11 @@ export const GET_USERS = gql`
       email
       description
       avatar
+      _count {
+        followers
+        following
+        Post
+      }
     }
   }
 `

@@ -22,14 +22,49 @@ export const GET_POSTS_USER = gql`
       }
       comments
       saved
+      rating
+      isSaved
       createdAt
     }
   }
 `
 
 export const GET_POSTS = gql`
-  query GetPosts {
-    getPosts {
+  query GetPosts($cursor: String, $take: Int) {
+    getPosts(cursor: $cursor, take: $take) {
+      posts {
+        id
+        user {
+          id
+          username
+          avatar
+        }
+        title
+        description
+        preview
+        Stack {
+          idPost
+          idTechnology
+          tech {
+            id
+            name
+          }
+        }
+        comments
+        saved
+        isFollowing
+        isSaved
+        rating
+        createdAt  
+      },
+      cursor
+    }
+  }
+`
+
+export const GET_POSTS_FOLLOWINGS = gql`
+  query GetPostsFollowings {
+    getPostsFollowings {
       id
       user {
         id
@@ -49,6 +84,39 @@ export const GET_POSTS = gql`
       }
       comments
       saved
+      rating
+      isFollowing
+      isSaved
+      createdAt
+    }
+  }
+`
+
+export const GET_POSTS_FILTER = gql`
+  query GetPostsFilter($filter: PostFilterInput!) {
+    getPostsFilter(filter: $filter) {
+      id
+      user {
+        id
+        username
+        avatar
+      }
+      title
+      description
+      preview
+      Stack {
+        idPost
+        idTechnology
+        tech {
+          id
+          name
+        }
+      }
+      comments
+      saved
+      rating
+      isFollowing
+      isSaved
       createdAt
     }
   }
@@ -88,7 +156,15 @@ export const GET_POST = gql`
       }
       saved
       createdAt
+      rating
+      isSaved
+      myRating {
+        rating
+        idPost
+        idUser
+      }
       _count {
+        Rating
         Post_saved
       }
       File{
@@ -118,36 +194,12 @@ export const POST_POST = gql`
 `
 
 export const PUT_POST = gql`
-  mutation PutPost($idUser: String!, $title: String, $description: String, $preview: String) {
-    putPost(idUser: $idUser, title: $title, description: $description, preview: $preview) {
+  mutation PutPost($putPostId: String!, $title: String, $description: String, $technologies: [TechnologyInput]!, $newTechnologies: [NewTechnology], $filesDelete: [FilesDelete]) {
+    putPost(id: $putPostId, title: $title, description: $description, technologies: $technologies, newTechnologies: $newTechnologies, filesDelete: $filesDelete) {
       id
-      user {
-        id
-        username
-        avatar
-      }
       title
       description
       preview
-      Comment {
-        id
-        idPost
-        idUser
-        text
-        createdAt
-      }
-      Stack {
-        idPost
-        idTechnology
-        tech {
-          id
-          name
-        }
-      }
-      saved
-      _count {
-        Post_saved
-      }
       createdAt
     }
   }

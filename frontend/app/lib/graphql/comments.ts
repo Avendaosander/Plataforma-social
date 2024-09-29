@@ -23,6 +23,11 @@ export const POST_COMMENT = gql`
       id
       idPost
       idUser
+      user {
+        id
+        username
+        avatar
+      }
       text
       createdAt
     }
