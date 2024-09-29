@@ -17,7 +17,7 @@ function Comment({ comment }: CommentProps) {
     <div className='flex items-start px-3 py-2 rounded-xl gap-2 hover:bg-white/10'>
       <Link
         href={`/home/profile/${comment.user.id}`}
-        className='flex gap-2 items-center'
+        className='flex gap-2 items-center size-8'
       >
         <Image
           src={avatarSrc}
@@ -27,7 +27,7 @@ function Comment({ comment }: CommentProps) {
           className='size-8 aspect-square'
         />
       </Link>
-      <div className='flex flex-col gap-1'>
+      <div className='flex flex-col gap-1 w-full'>
         <div className='flex justify-between items-center'>
           <p className='text-sm font-semibold'>{comment.user.username}</p>
           <span className='opacity-75 text-xs'>{getTimeElapsed(comment.createdAt)}</span>
