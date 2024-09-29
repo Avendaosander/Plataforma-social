@@ -2,9 +2,10 @@ export const typeDefs = `#graphql
    type Query {
       login(email: String!, password: String!): LoginResponse
       getUser(id: String!): UserProfile
-      getUsers: [User]
+      getUsers: [UserProfile]
       getPost(id: String!): Post
-      getPosts: [PostSummary]
+      getPosts(cursor: String, take: Int): GetPosts
+      getPostsFollowings: [PostSummary]
       getPostsUser(idUser: String!): [PostSummary!]
       getPostsFilter(filter: PostFilterInput!): [PostSummary!]!
       getTechnologies: [Technology]
@@ -18,12 +19,12 @@ export const typeDefs = `#graphql
       putUser(id: String!, username: String, description: String, avatar: String): User
       deleteUser(id: String!): ResponseID
       postPost(title: String!, description: String!, technologies: [TechnologyInput]!, newTechnologies: [NewTechnology]): Post
-      putPost(idUser: String!, title: String, description: String, preview: String): Post
+      putPost(id: String!, title: String, description: String, technologies: [TechnologyInput]!, newTechnologies: [NewTechnology], filesDelete: [FilesDelete]): Post
       deletePost(id: String!): ResponseID
-      postComment(idPost: String!, idUser: String!, text: String!): Comment
+      postComment(idPost: String!, idUser: String!, text: String!): CommentsWithData
       deleteComment(id: String!): ResponseID
-      postRating(idPost: String!, idUser: String!, data: RatingInput!): Rating!
-      putRating(idPost: String!, idUser: String!, data: RatingInput!): Rating!
+      postRating(idPost: String!, idUser: String!, rating: Float!): Rating!
+      putRating(idPost: String!, idUser: String!, rating: Float!): Rating!
       deleteRating(idPost: String!, idUser: String!): Rating!
       postFollower(idFollower: String!, idFollowing: String!): FollowerResponse
       deleteFollower(idFollower: String!, idFollowing: String!): ResponseID
@@ -44,6 +45,7 @@ export const typeDefs = `#graphql
    type SubscriptionResponse {
       id: String
       text: String
+      link: String
    }
    # USERS
    type User {
@@ -127,7 +129,16 @@ export const typeDefs = `#graphql
       Stack: [Stack]
       saved: Int
       _count: Count
+      rating: Float
+      isFollowing: Boolean
+      isSaved: Boolean
+      myRating: RatingSummary
       createdAt: String
+   }
+
+   type GetPosts {
+      posts: [PostSummary]
+      cursor: String
    }
 
    type PostSummary {
@@ -139,14 +150,16 @@ export const typeDefs = `#graphql
       Stack: [Stack]
       comments: Int
       saved: Int
-      Rating: [Rating]
+      rating: Float
+      isFollowing: Boolean
+      isSaved: Boolean
       createdAt: String
    }
 
    input PostFilterInput {
-      idUser: String
+      user: String
       title: String
-      technologies: [String!]
+      technology: String
       rating: Float
    }
 
@@ -199,6 +212,12 @@ export const typeDefs = `#graphql
       user: User
    }
 
+   type RatingSummary {
+      idPost: String
+      idUser: String
+      rating: Float
+   }
+
    input RatingInput {
       idPost: String
       idUser: String
@@ -212,7 +231,14 @@ export const typeDefs = `#graphql
       file: String
    }
 
+   input FilesDelete {
+      id: String
+      idPost: String
+      file: String
+   }
+
    type Count {
+      Rating: Int
       Post_saved: Int
    }
 

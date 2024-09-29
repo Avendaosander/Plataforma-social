@@ -10,10 +10,10 @@ export interface Context {
 }
 
 export type PostFilterInput = {
-	idUser: string
-	title: string
-	technologies: [string]
-	rating: number
+	user?: string
+	title?: string
+	technology?: string
+	rating?: number
 }
 
 export type NewTechnology = {
