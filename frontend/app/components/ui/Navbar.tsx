@@ -19,9 +19,10 @@ import ButtonDarkMode from "./ButtonDarkMode"
 import { signOut } from "next-auth/react"
 import LogoIcon from "../icons/LogoIcon"
 import { useUserStore } from "@/app/store/user"
-import { useSubscription } from "@apollo/client"
-import { NEW_FOLLOWER } from "@/app/lib/graphql/subscriptions"
-import { WSNewFollower } from "@/app/lib/types/typesGraphql"
+import { useQuery } from "@apollo/client"
+import { GET_NOTIFICATIONS } from "@/app/lib/graphql/notifications"
+import { GetNotifications, Notification as NotificationType, Notifications} from "@/app/lib/types/typesGraphql"
+import Notification from "./Notification"
 
 function Navbar() {
 	const [mainActive, setMainActive] = useState(false)
@@ -29,11 +30,49 @@ function Navbar() {
 	const idUser = useUserStore(state => state.user.id)
 	const pathname = usePathname()
 	const router = useRouter()
-	useSubscription<WSNewFollower>(NEW_FOLLOWER,{
-		onData: ({ data }) => {
-			console.log(data.data?.newFollower)
-		}
+
+	const [notifications, setNotifications] = useState<NotificationType[]>([])
+	const [unread, setUnread] = useState(0)
+	const [cursor, setCursor] = useState('')
+	const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+
+	const { data, loading, error, fetchMore} = useQuery<GetNotifications>(GET_NOTIFICATIONS, {
+		variables: { idUser },
+		fetchPolicy: "network-only"
 	})
+
+	const handleState = (state: NotificationType[], unread: number) => {
+		setNotifications(state)
+		setUnread(unread)
+	}
+
+	useEffect(() => {
+		if (data) {
+      setNotifications(data.getNotifications.notifications)
+      setUnread(data.getNotifications.unread)
+			setCursor(data.getNotifications.cursor)
+			setHasMore(data.getNotifications.hasMore)
+		}
+	}, [data])
+
+	const moreData = async () => {
+		setLoadingMore(true)
+		const res = await fetchMore({
+			variables: {
+				cursor,
+				take: 5
+			}
+		})
+		
+		if (res.data.getNotifications) {
+			setNotifications(prev => prev.concat(res.data.getNotifications.notifications))
+			setCursor(res.data.getNotifications.cursor)
+			setHasMore(res.data.getNotifications.hasMore)
+		}
+		setLoadingMore(false)
+	}
+	
 
 	const widthCondition = notifyOpen ? "w-auto h-11" : "w-full"
 	const notifyClasses = `mx-0 px-3 ${
@@ -74,7 +113,7 @@ function Navbar() {
 			document.removeEventListener("click", handleClickOutsideNotify)
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [mainActive, notifyOpen])
+	}, [mainActive, notifyOpen, notifications, hasMore, loadingMore])
 
 	return (
 		<section className={`fixed flex gap-5 bg-seagreen-900 dark:border-r dark:border-white/40 dark:bg-transparent ${pathname === `/home/profile/${idUser}/settings` ? 'hidden' : ''}`}>
@@ -93,7 +132,7 @@ function Navbar() {
 					</Button>
 				</Link>
 				<nav className={`w-full`}>
-					<ul className='flex flex-col gap-4'>
+					<ul className='flex flex-col gap-4 relative'>
 						<li>
 							<Link href={"/home"}>
 								<Button
@@ -125,7 +164,7 @@ function Navbar() {
 							</Link>
 						</li>
 						<li>
-							<Link href={"/home?page=trending"}>
+							<Link href={"/home/populates"}>
 								<Button
 									size='lg'
 									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
@@ -154,7 +193,7 @@ function Navbar() {
 								</Button>
 							</Link>
 						</li>
-						<li>
+						<li className="relative">
 							<Button
 								size='lg'
 								onClick={notifyHandle}
@@ -163,6 +202,9 @@ function Navbar() {
 							>
 								{!notifyOpen && "Notificaciones"}
 							</Button>
+							{notifications && unread >= 1 && (
+								<p className="absolute top-0 right-0 px-2 py-1 rounded-full bg-lima-500 text-xs">{unread}</p>
+							)}
 						</li>
 						<li>
 							<Link href={`/home/profile/${idUser}`}>
@@ -250,11 +292,23 @@ function Navbar() {
 			</div>
 			{notifyOpen && (
 				<div
-					className='absolute left-full w-[300px] h-screen bg-seagreen-900 dark:bg-storm-950  text-storm-100  py-2 pr-4 flex flex-col gap-3 border-r border-white/40'
+					className='absolute left-full w-[300px] h-screen bg-seagreen-900 dark:bg-storm-950  text-storm-100 py-2 pr-4 flex flex-col gap-3 border-r border-white/40 overflow-auto scrollbar-thin'
 					id='notify'
 				>
-					<h3 className='text-lg font-semibold'>Notificaciones</h3>
-					<p className='border-t-[1px] border-white/40'>Esta semana</p>
+					<h3 className='text-lg font-semibold border-b-[1px]'>Notificaciones</h3>
+					{notifications.map(notification => (
+						<Notification key={notification.id} notification={notification} state={notifications} handleState={handleState} unread={unread}/>
+					))}
+					{loadingMore && <p className="py-2">Cargando más...</p>}
+					{(!loadingMore && notifications.length >= 1 && hasMore) && (
+						<Button
+							className='px-3 justify-center'
+							variant="flat"
+							onClick={() => moreData()}
+						>
+							Cargar mas notificaciones
+						</Button>
+					)}
 				</div>
 			)}
 		</section>
