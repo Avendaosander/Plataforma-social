@@ -1,30 +1,34 @@
 import { gql } from "@apollo/client";
 
 export const GET_POSTS_USER = gql`
-  query GetPostsUser($idUser: String!) {
-    getPostsUser(idUser: $idUser) {
-      id
-      user {
+  query GetPostsUser($idUser: String!, $cursor: String, $take: Int) {
+    getPostsUser(idUser: $idUser, cursor: $cursor, take: $take) {
+      posts {
         id
-        username
-        avatar
-      }
-      title
-      description
-      preview
-      Stack {
-        idPost
-        idTechnology
-        tech {
+        user {
           id
-          name
+          username
+          avatar
         }
-      }
-      comments
-      saved
-      rating
-      isSaved
-      createdAt
+        title
+        description
+        preview
+        Stack {
+          idPost
+          idTechnology
+          tech {
+            id
+            name
+          }
+        }
+        comments
+        saved
+        isSaved
+        rating
+        createdAt  
+      },
+      cursor
+      hasMore
     }
   }
 `
@@ -58,66 +62,110 @@ export const GET_POSTS = gql`
         createdAt  
       },
       cursor
+      hasMore
+    }
+  }
+`
+
+export const GET_POSTS_POPULATE = gql`
+  query GetPostsPopulate($cursor: String, $take: Int) {
+    getPostsPopulate(cursor: $cursor, take: $take) {
+      posts {
+        id
+        user {
+          id
+          username
+          avatar
+        }
+        title
+        description
+        preview
+        Stack {
+          idPost
+          idTechnology
+          tech {
+            id
+            name
+          }
+        }
+        comments
+        saved
+        rating
+        totalRating
+        isFollowing
+        isSaved
+        createdAt
+      }
+      cursor
+      hasMore
     }
   }
 `
 
 export const GET_POSTS_FOLLOWINGS = gql`
-  query GetPostsFollowings {
-    getPostsFollowings {
-      id
-      user {
+  query GetPostsFollowings ($cursor: String, $take: Int) {
+    getPostsFollowings (cursor: $cursor, take: $take) {
+      posts {
         id
-        username
-        avatar
-      }
-      title
-      description
-      preview
-      Stack {
-        idPost
-        idTechnology
-        tech {
+        user {
           id
-          name
+          username
+          avatar
         }
-      }
-      comments
-      saved
-      rating
-      isFollowing
-      isSaved
-      createdAt
+        title
+        description
+        preview
+        Stack {
+          idPost
+          idTechnology
+          tech {
+            id
+            name
+          }
+        }
+        comments
+        saved
+        isFollowing
+        isSaved
+        rating
+        createdAt  
+      },
+      cursor
+      hasMore
     }
   }
 `
 
 export const GET_POSTS_FILTER = gql`
-  query GetPostsFilter($filter: PostFilterInput!) {
-    getPostsFilter(filter: $filter) {
-      id
-      user {
+  query GetPostsFilter($filter: PostFilterInput!, $cursor: String, $take: Int) {
+    getPostsFilter(filter: $filter, cursor: $cursor, take: $take) {
+      posts {
         id
-        username
-        avatar
-      }
-      title
-      description
-      preview
-      Stack {
-        idPost
-        idTechnology
-        tech {
+        user {
           id
-          name
+          username
+          avatar
         }
-      }
-      comments
-      saved
-      rating
-      isFollowing
-      isSaved
-      createdAt
+        title
+        description
+        preview
+        Stack {
+          idPost
+          idTechnology
+          tech {
+            id
+            name
+          }
+        }
+        comments
+        saved
+        isFollowing
+        isSaved
+        rating
+        createdAt  
+      },
+      cursor
+      hasMore
     }
   }
 `

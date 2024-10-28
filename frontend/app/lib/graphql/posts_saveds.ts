@@ -1,13 +1,18 @@
 import { gql } from "@apollo/client";
 
 export const GET_POSTS_SAVED = gql`
-  query GetPostsSaved($idUser: String!) {
-    getPostsSaved(idUser: $idUser) {
-      user {
-        id
-      }
-      post {
-        id
+  query GetPostsSaved($idUser: String!, $cursor: String, $take: Int) {
+    getPostsSaved(idUser: $idUser, cursor: $cursor, take: $take) {
+      posts {
+        idUser
+        idPost
+        user {
+          id
+          username
+          avatar
+        }
+        post {
+          id
         user {
           id
           username
@@ -24,17 +29,16 @@ export const GET_POSTS_SAVED = gql`
             name
           }
         }
+        comments
         saved
-        _count {
-          Post_saved
-        }
         rating
         isFollowing
         isSaved
         createdAt
+        }
       }
-      idUser
-      idPost
+      cursor
+      hasMore
     }
   }
 `

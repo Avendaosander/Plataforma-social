@@ -9,17 +9,6 @@ export const LOGIN = gql`
       description
       avatar
       password
-      Setting {
-        idSetting
-        private
-        n_ratings
-        n_comments
-        n_followers
-        n_populates
-        n_email_comments
-        n_email_followers
-        n_email_ratings
-      }
       token
     }
   }
