@@ -1,43 +1,58 @@
-'use client'
-import Image from 'next/image'
-import React, { useState } from 'react'
-import Button from '@/ui/Button'
-import { DotsIcon, EditIcon, ShareRightIcon } from '@/icons'
-import { DeleteFollower, GetUserProfile, PostFollower } from '@/typesGraphql'
-import { useMutation, useQuery } from '@apollo/client'
-import { DELETE_FOLLOWER, GET_FOLLOWERS, POST_FOLLOWER } from '@/app/lib/graphql/followers'
-import { GET_USER } from '@/app/lib/graphql/users'
-import { useSession } from 'next-auth/react'
-import { GET_POSTS_USER } from '@/app/lib/graphql/posts'
+"use client"
+import Image from "next/image"
+import React, { useState } from "react"
+import Button from "@/ui/Button"
+import { EditIcon, ShareRightIcon } from "@/icons"
+import { DeleteFollower, GetUserProfile, PostFollower } from "@/typesGraphql"
+import { useMutation, useQuery } from "@apollo/client"
+import {
+	DELETE_FOLLOWER,
+	GET_FOLLOWERS,
+	POST_FOLLOWER
+} from "@/app/lib/graphql/followers"
+import { GET_USER } from "@/app/lib/graphql/users"
+import { useSession } from "next-auth/react"
+import ShareModal from "../ui/ShareModal"
 
 interface PropsInfo {
-  handleEditMode: (state: boolean) => any,
-  user: GetUserProfile
+	handleEditMode: (state: boolean) => any
+	user: GetUserProfile
 	isMyProfile: boolean
 	following: boolean
 }
 
-function InfoProfile({ handleEditMode, user, isMyProfile, following }: PropsInfo) {
-	const avatar = user?.avatar ? `${process.env.NEXT_PUBLIC_API_ROUTE_AVATAR}${user.avatar}` : "/User.png"
+function InfoProfile({
+	handleEditMode,
+	user,
+	isMyProfile,
+	following
+}: PropsInfo) {
+	const avatar = user?.avatar
+		? `${process.env.NEXT_PUBLIC_API_ROUTE_AVATAR}${user.avatar}`
+		: "/User.png"
 	const [isFollowing, setIsFollowing] = useState(following)
-  const { data: sessionData } = useSession()
-	const idUser = localStorage.getItem('idUser')
+	const { data: sessionData } = useSession()
+	const idUser = localStorage.getItem("idUser")
+	const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+	const shareUrl = `${process.env.NEXT_PUBLIC_URL}home/profile/${idUser}`
 
 	const { refetch: refetchGetfollowers } = useQuery(GET_FOLLOWERS, {
 		variables: { idFollower: idUser },
 		skip: true
-	});
+	})
 	const { refetch: refetchGetUser } = useQuery(GET_USER, {
 		variables: { id: idUser },
 		skip: true
-	});
+	})
 	const { refetch: refetchGetUserFollow } = useQuery(GET_USER, {
 		variables: { id: user.id },
 		skip: true
-	});
+	})
 
-	const [ postFollower, { data: dataFollowing, error: errorFollowing}] = useMutation<PostFollower>(POST_FOLLOWER)
-	const [ deleteFollower, { data: unfollowing, error: errorUnfollowing}] = useMutation<DeleteFollower>(DELETE_FOLLOWER)
+	const [postFollower, { data: dataFollowing, error: errorFollowing }] =
+		useMutation<PostFollower>(POST_FOLLOWER)
+	const [deleteFollower, { data: unfollowing, error: errorUnfollowing }] =
+		useMutation<DeleteFollower>(DELETE_FOLLOWER)
 
 	const handleFollowing = async () => {
 		if (isFollowing) {
@@ -71,75 +86,77 @@ function InfoProfile({ handleEditMode, user, isMyProfile, following }: PropsInfo
 		}
 	}
 
-  return (
-    <>
-      <Image
-					src={avatar}
-					alt='Avatar'
-					width={120}
-					height={120}
-					className='aspect-square size-[120px]'
-				/>
-				<div className='flex flex-col gap-5'>
-					<div className='flex gap-6'>
-						<h2 className='text-lg font-semibold'>{user?.username}</h2>
-						{isMyProfile ? (
-							<Button
-								color='primary'
-								variant='outline'
-								shape='sm'
-								className='px-5 py-1'
-								startContent={<EditIcon />}
-								onClick={()=>{handleEditMode(true)}}
-							>
-								Editar Perfil
-							</Button>
-						) : (
-							<Button
-								color='primary'
-								variant={isFollowing ? 'solid' : 'outline'}
-								shape='sm'
-								className='px-5 py-1'
-								startContent={!isFollowing && <EditIcon />}
-								onClick={()=>{handleFollowing()}}
-							>
-								{isFollowing ? 'Siguiendo' : 'Seguir'}
-							</Button>
-						)}
+	return (
+		<>
+			<Image
+				src={avatar}
+				alt='Avatar'
+				width={120}
+				height={120}
+				className='aspect-square size-[120px]'
+			/>
+			<div className='flex flex-col gap-5'>
+				<div className='flex gap-6'>
+					<h2 className='text-lg font-semibold'>{user?.username}</h2>
+					{isMyProfile ? (
 						<Button
 							color='primary'
 							variant='outline'
 							shape='sm'
-							className='px-1 py-1'
-							startContent={<ShareRightIcon />}
-						></Button>
-						{isMyProfile && (
-							<Button
-								color='primary'
-								variant='outline'
-								shape='sm'
-								className='px-1 py-1'
-								startContent={<DotsIcon />}
-							></Button>
-						)}
-					</div>
-					<div className='flex gap-6'>
-						<p>
-							<span className='font-semibold'>{user._count.following}</span> Seguidores
-						</p>
-						<p>
-							<span className='font-semibold'>{user._count.followers}</span> Seguidos
-						</p>
-						<p>
-							<span className='font-semibold'>{user._count.Post}</span> Componentes
-						</p>
-					</div>
-					<p className='max-w-[60ch]'>
-						{user?.description}
+							className='px-5 py-1'
+							startContent={<EditIcon />}
+							onClick={() => {
+								handleEditMode(true)
+							}}
+						>
+							Editar Perfil
+						</Button>
+					) : (
+						<Button
+							color='primary'
+							variant={isFollowing ? "solid" : "outline"}
+							shape='sm'
+							className='px-5 py-1'
+							onClick={() => {
+								handleFollowing()
+							}}
+						>
+							{isFollowing ? "Siguiendo" : "Seguir"}
+						</Button>
+					)}
+					<Button
+						color='primary'
+						variant='outline'
+						shape='sm'
+						className='px-1 py-1'
+						onClick={() => setIsShareModalOpen(true)}
+						startContent={<ShareRightIcon />}
+					></Button>
+				</div>
+				<div className='flex gap-6'>
+					<p>
+						<span className='font-semibold'>{user._count.following}</span>{" "}
+						Seguidores
+					</p>
+					<p>
+						<span className='font-semibold'>{user._count.followers}</span>{" "}
+						Seguidos
+					</p>
+					<p>
+						<span className='font-semibold'>{user._count.Post}</span>{" "}
+						Componentes
 					</p>
 				</div>
-    </>
-  )
+				<p className='max-w-[60ch]'>{user?.description}</p>
+			</div>
+			{isShareModalOpen && (
+				<ShareModal
+					onClose={() => setIsShareModalOpen(false)}
+					shareUrl={shareUrl}
+				/>
+			)}
+		</>
+	)
 }
 
 export default InfoProfile
