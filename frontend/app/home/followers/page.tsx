@@ -10,11 +10,14 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
 function Page() {
-	const { data, loading, error } = useQuery<GetPostsFollowings>(GET_POSTS_FOLLOWINGS, {
+	const { data, loading, error, fetchMore } = useQuery<GetPostsFollowings>(GET_POSTS_FOLLOWINGS, {
 		fetchPolicy: "network-only"
 	})
 
 	const [posts, setPosts] = useState<DataPosts[]>([])
+	const [cursor, setCursor] = useState('')
+	const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false);
 
 	const handleFollowing = (idUser: string, isFollowing: boolean) => {
 		setPosts(prevPosts =>
@@ -32,22 +35,58 @@ function Page() {
 
 	useEffect(() => {
 		if (data?.getPostsFollowings) {
-			setPosts(data.getPostsFollowings)
+			console.log(data.getPostsFollowings.posts)
+      setPosts((prevPosts) => [...prevPosts, ...data.getPostsFollowings.posts]);
+			setCursor(data.getPostsFollowings.cursor)
+			setHasMore(data.getPostsFollowings.hasMore)
 		}
 	}, [data])
+
+	const morePosts = async () => {
+		setLoadingMore(true)
+		const res = await fetchMore({
+			variables: {
+				cursor,
+				take: 5
+			}
+		})
+
+		if (res.data.getPostsFollowings) {
+			setPosts(prevPosts => prevPosts.concat(res.data.getPostsFollowings.posts))
+			setCursor(res.data.getPostsFollowings.cursor)
+			setHasMore(res.data.getPostsFollowings.hasMore)
+		}
+		setLoadingMore(false)
+	}
 
   return (
 		<>
 			<section className='flex flex-col h-full items-center w-full gap-5'>
 				<InputSearch />
-				{posts.map(post => (
-					<CardPost
-						key={post.id}
-						post={post}
-						handleFollowing={handleFollowing}
-						handleSaved={handleSaved}
-					/>
+				{posts?.length == 0 ? (
+					<div>
+						<p>Los usuarios que sigues aun no publican sus componentes</p>
+					</div>
+				):(
+					posts.map(post => (
+						<CardPost
+							key={post.id}
+							post={post}
+							handleFollowing={handleFollowing}
+							handleSaved={handleSaved}
+						/>
+					)
 				))}
+				{loadingMore && <p className='py-2'>Cargando más...</p>}
+				{(!loadingMore && posts.length >= 1 && hasMore) && (
+					<Button
+						className='px-3'
+						variant="flat"
+						onClick={() => morePosts()}
+					>
+						Cargar mas componentes
+					</Button>
+				)}
 			</section>
 			<Link href={"/home/create"}>
 				<Button

@@ -11,8 +11,8 @@ import { GetPosts, DataPosts } from "../lib/types/typesGraphql"
 
 function Home() {
 	const [posts, setPosts] = useState<DataPosts[]>([])
-	console.log(posts)
 	const [cursor, setCursor] = useState('')
+	const [hasMore, setHasMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false);
 	const { data, loading, error, fetchMore } = useQuery<GetPosts>(GET_POSTS, {
 		fetchPolicy: "network-only",
@@ -40,9 +40,9 @@ function Home() {
 
 	useEffect(() => {
 		if (data?.getPosts) {
-			console.log(data.getPosts.posts)
       setPosts((prevPosts) => [...prevPosts, ...data.getPosts.posts]);
 			setCursor(data.getPosts.cursor)
+			setHasMore(data.getPosts.hasMore)
 		}
 	}, [data])
 
@@ -58,6 +58,7 @@ function Home() {
 		if (res.data.getPosts) {
 			setPosts(prevPosts => prevPosts.concat(res.data.getPosts.posts))
 			setCursor(res.data.getPosts.cursor)
+			setHasMore(res.data.getPosts.hasMore)
 		}
 		setLoadingMore(false)
 	}
@@ -66,17 +67,23 @@ function Home() {
 		<>
 			<section className='flex flex-col h-full items-center w-full gap-5'>
 				<InputSearch />
-				{posts.map(post => (
-					<CardPost
-						key={post.id}
-						post={post}
-						handleFollowing={handleFollowing}
-						handleSaved={handleSaved}
-					/>
+				{posts?.length == 0 ? (
+					<div>
+						<p>No hay componentes de momento</p>
+					</div>
+				):(
+					posts.map(post => (
+						<CardPost
+							key={post.id}
+							post={post}
+							handleFollowing={handleFollowing}
+							handleSaved={handleSaved}
+						/>
+					)
 				))}
 
-				{loadingMore && <p>Cargando más...</p>}
-				{posts.length >= 1 && (
+				{loadingMore && <p className="py-2">Cargando más...</p>}
+				{(!loadingMore && posts.length >= 1 && hasMore) && (
 					<Button
 						className='px-3'
 						variant="flat"
