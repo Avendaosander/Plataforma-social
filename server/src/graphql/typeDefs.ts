@@ -5,13 +5,16 @@ export const typeDefs = `#graphql
       getUsers: [UserProfile]
       getPost(id: String!): Post
       getPosts(cursor: String, take: Int): GetPosts
-      getPostsFollowings: [PostSummary]
-      getPostsUser(idUser: String!): [PostSummary!]
-      getPostsFilter(filter: PostFilterInput!): [PostSummary!]!
+      getPostsPopulate(cursor: String, take: Int): GetPostsPopulate
+      getPostsFollowings(cursor: String, take: Int): GetPostsFollowings
+      getPostsUser(idUser: String!, cursor: String, take: Int): GetPostsUser
+      getPostsFilter(filter: PostFilterInput!, cursor: String, take: Int): GetPostsFilter
       getTechnologies: [Technology]
       getComments(id: String!): [CommentsWithData]
       getFollowers(idFollower: String!): [Follower]
-      getPostsSaved(idUser: String!): [Post_saved]
+      getPostsSaved(idUser: String!, cursor: String, take: Int): GetPostsSaved
+      getNotifications(idUser: String!, cursor: String, take: Int): Notifications
+      getSettings(idUser: String!): Setting
    }
 
    type Mutation {
@@ -26,27 +29,18 @@ export const typeDefs = `#graphql
       postRating(idPost: String!, idUser: String!, rating: Float!): Rating!
       putRating(idPost: String!, idUser: String!, rating: Float!): Rating!
       deleteRating(idPost: String!, idUser: String!): Rating!
-      postFollower(idFollower: String!, idFollowing: String!): FollowerResponse
+      postFollower(idFollower: String!, idFollowing: String!): Follower
       deleteFollower(idFollower: String!, idFollowing: String!): ResponseID
       postPostSaved(idUser: String!, idPost: String!): Post_savedResponse
       deletePostSaved(idUser: String!, idPost: String!): ResponseID
+      putNotification(id: String!, read: Boolean!): ResponseID
+      deleteNotification(id: String!): ResponseID
+      putSettings(data: SettingInput): Setting
+      sendRecoveryCode(email: String!): ResponseOK
+      verifyCode(email: String!, code: String!): ResponseOK
+      changePassword(email: String!, password: String!): ResponseOK
    }
-
-   type Subscription {
-      newFollower: SubscriptionResponse
-      postCreated: SubscriptionResponse
-      postEdited: SubscriptionResponse
-      postDeleted: SubscriptionResponse
-      postCommented: SubscriptionResponse
-      postRated: SubscriptionResponse
-      postSaved: SubscriptionResponse
-   }
-
-   type SubscriptionResponse {
-      id: String
-      text: String
-      link: String
-   }
+   
    # USERS
    type User {
       id: String
@@ -102,6 +96,10 @@ export const typeDefs = `#graphql
    type ResponseID {
       id: String
    }
+
+   type ResponseOK {
+      response: String
+   }
    
    #SETTINGS
    type Setting {
@@ -112,9 +110,33 @@ export const typeDefs = `#graphql
       n_comments: Boolean
       n_followers: Boolean
       n_populates: Boolean
+      n_new_post: Boolean
+      n_edit_post: Boolean
+      n_delete_post: Boolean
       n_email_ratings: Boolean
       n_email_comments: Boolean
       n_email_followers: Boolean
+      n_email_new_post: Boolean
+      n_email_edit_post: Boolean
+      n_email_delete_post: Boolean
+   }
+
+   input SettingInput {
+      idSetting: String
+      idUser: String
+      n_ratings: Boolean
+      n_comments: Boolean
+      n_followers: Boolean
+      n_populates: Boolean
+      n_new_post: Boolean
+      n_edit_post: Boolean
+      n_delete_post: Boolean
+      n_email_ratings: Boolean
+      n_email_comments: Boolean
+      n_email_followers: Boolean
+      n_email_new_post: Boolean
+      n_email_edit_post: Boolean
+      n_email_delete_post: Boolean
    }
 
    # POSTS
@@ -139,6 +161,53 @@ export const typeDefs = `#graphql
    type GetPosts {
       posts: [PostSummary]
       cursor: String
+      hasMore: Boolean
+   }
+
+   type GetPostsPopulate {
+      posts: [PostSummaryPopulate]
+      cursor: String
+      hasMore: Boolean
+   }
+
+   type GetPostsFollowings {
+      posts: [PostSummary]
+      cursor: String
+      hasMore: Boolean
+   }
+
+   type GetPostsFilter {
+      posts: [PostSummary]
+      cursor: String
+      hasMore: Boolean
+   }
+
+   type GetPostsUser {
+      posts: [PostSummary]
+      cursor: String
+      hasMore: Boolean
+   }
+
+   type GetPostsSaved {
+      posts: [Post_saved]
+      cursor: String
+      hasMore: Boolean
+   }
+
+   type PostSummaryPopulate {
+      id: String
+      user: UserInfo
+      title: String
+      description: String
+      preview: String
+      Stack: [Stack]
+      comments: Int
+      saved: Int
+      rating: Float
+      totalRating: Float
+      isFollowing: Boolean
+      isSaved: Boolean
+      createdAt: String
    }
 
    type PostSummary {
@@ -258,7 +327,7 @@ export const typeDefs = `#graphql
    #POSTS_SAVED
    type Post_saved {
       user: User
-      post: Post
+      post: PostSummary
       idUser: String
       idPost: String
    }
@@ -266,5 +335,24 @@ export const typeDefs = `#graphql
    type Post_savedResponse {
       idUser: String!
       idPost: String!
+   }
+
+   type Notification {
+      id: String
+      idUser: String
+      user: User
+      idUserSend: String
+      userSend: User
+      message: String
+      link: String
+      read: Boolean
+      createdAt: String 
+   }
+
+   type Notifications {
+      notifications: [Notification]
+      unread: Int
+      cursor: String
+      hasMore: Boolean
    }
 `

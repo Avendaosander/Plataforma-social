@@ -1,3 +1,5 @@
+import { User } from "@prisma/client"
+
 export type Token = {
 	id: string
 	email: string
@@ -25,4 +27,12 @@ export type Notification = {
   username: string
   message: string
   text: string
+}
+
+export type Follower = {
+	follower: User
+	following: User
+	idFollower: string
+	idFollowing: string
+	createdAt: string
 }
