@@ -7,6 +7,7 @@ import { signIn, useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
 import { toastCustom } from "@/app/components/ui/toasts"
 import { Toaster } from "react-hot-toast"
+import ModalSendRecovery from "./ModalSendRecovery"
 
 function FormLogin() {
 	const { status } = useSession()
@@ -14,6 +15,7 @@ function FormLogin() {
 		email: "",
 		password: ""
 	})
+	const [recoveryMode, setRecoveryMode] = useState(false)
 	
 	if (status === "authenticated") {
 		redirect('/home')
@@ -53,9 +55,9 @@ function FormLogin() {
 
 	return (
 		<div className='flex flex-col gap-5 items-center'>
-			<h2 className='text-4xl font-semibold'>Iniciar sesion</h2>
+			<h2 className='text-2xl md:text-4xl font-semibold'>Iniciar sesion</h2>
 			<form
-				className='text-lg font-medium p-5 rounded-2xl ring-1 ring-seagreen-950 dark:ring-white flex flex-col gap-5 w-[300px] bg-white dark:bg-transparent shadow-small shadow-white/25'
+				className='text-sm sm:text-base md:text-lg font-medium p-5 rounded-2xl ring-1 ring-seagreen-950 dark:ring-white flex flex-col gap-5 w-[300px] bg-white dark:bg-transparent shadow-small shadow-white/25'
         onSubmit={e => handleSubmit(e)}
 			>
 				<div className='flex flex-col gap-1'>
@@ -87,15 +89,19 @@ function FormLogin() {
           size='lg'
           marginX='auto'
           shape='md'
+					className="text-md md:text-lg"
         >
           Iniciar Sesion
         </Button>
-				<p className='text-sm text-center'>¿Olvidaste tu contraseña?</p>
+				<p className='text-xs sm:text-sm text-center cursor-pointer' onClick={() => setRecoveryMode(!recoveryMode)}>¿Olvidaste tu contraseña?</p>
 			</form>
 			<Link href={`/register`}>
-				¿No tienes una cuenta? <span className='font-semibold'>Regístrate</span>
+				¿No tienes una cuenta? <span className='font-semibold text-sm sm:text-base md:text-lg'>Regístrate</span>
 			</Link>
 			<Toaster/>
+			{recoveryMode && (
+				<ModalSendRecovery onClose={() => setRecoveryMode(false)}/>
+			)}
 		</div>
 	)
 }
