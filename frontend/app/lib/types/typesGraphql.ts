@@ -66,7 +66,6 @@ export type GetUsers = {
 
 // LOGIN
 export interface LoginClass extends UserBase {
-	Setting: Setting
 	token: string
 }
 
@@ -75,15 +74,20 @@ export type Login = {
 }
 
 export type Setting = {
-	idSettings: string
-	private: boolean
+	idSetting: string
 	n_ratings: boolean
 	n_comments: boolean
 	n_followers: boolean
 	n_populates: boolean
+	n_new_post: boolean
+	n_edit_post: boolean
+	n_delete_post: boolean
 	n_email_comments: boolean
 	n_email_followers: boolean
 	n_email_ratings: boolean
+	n_email_new_post: boolean
+	n_email_edit_post: boolean
+	n_email_delete_post: boolean
 }
 
 export type ResponseLogin = {
@@ -144,6 +148,10 @@ export interface Posts {
 
 export interface DataPosts extends Omit<Posts, "comment"> {}
 
+export interface DataPostsPopulate extends Omit<Posts, "comment"> {
+	totalRating: number
+}
+
 export type DataPostSaved = {
 	idPost: string
 	idUser: string
@@ -160,25 +168,42 @@ export type GetPosts = {
 	getPosts: PaginationData
 }
 
+export type GetPostsPopulate = {
+	getPostsPopulate: PaginationData
+}
+
 export type PaginationData = {
 	posts: DataPosts[],
 	cursor: string
+	hasMore: boolean
+}
+
+export type PaginationDataPopulate = {
+	posts: DataPostsPopulate[],
+	cursor: string
+	hasMore: boolean
+}
+
+export type PaginationPostsSaved = {
+	posts: DataPostSaved[],
+	cursor: string
+	hasMore: boolean
 }
 
 export type GetPostsFollowings = {
-	getPostsFollowings: DataPosts[]
+	getPostsFollowings: PaginationData
 }
 
 export type GetPostsFilter = {
-	getPostsFilter: DataPosts[]
+	getPostsFilter: PaginationData
 }
 
 export type GetPostsUser = {
-	getPostsUser: DataPosts[]
+	getPostsUser: PaginationData
 }
 
 export type GetPostsSaved = {
-	getPostsSaved: DataPostSaved[]
+	getPostsSaved: PaginationPostsSaved
 }
 
 export type postPostSaved = {
@@ -345,14 +370,98 @@ export type RatingInputDelete = {
 }
 
 
-// SUBSCRIPTIONS
+// NOTIFICATIONS
 
-export type SubscriptionData = {
-	id: string
-	text: string
-	link: string
+export type GetNotifications = {
+	getNotifications: Notifications;
 }
 
-export type WSNewFollower = {
-	newFollower: SubscriptionData
+export type Notification = {
+	id:        	string;
+	idUser:    	string;
+	user:			 	UserBase
+	idUserSend:	string;
+	userSend:	 	UserBase
+	avatar:    	string;
+	message:   	string;
+	link:      	string;
+	read:      	boolean;
+	createdAt: 	string;
+}
+
+export type Notifications = {
+	notifications: Notification[]
+	unread: number
+	cursor: string
+	hasMore: boolean
+}
+
+export type PutNotification = {
+	putNotification: ResponseID
+}
+
+export type PutNotificationVariables = {
+	putNotificationId: string
+	read: boolean
+}
+
+export type DeleteNotification = {
+	deleteNotification: ResponseID
+}
+	
+export type DeleteNotificationVariables = {
+	deleteNotificationId: string
+}
+
+export type GetSetting = {
+	getSettings: Setting
+}
+
+export type PutSetting = {
+	putSettings: Setting
+}
+
+export type PutSettingVariable = {
+	data: {
+		idSetting: string
+		n_ratings?: boolean
+		n_comments?: boolean
+		n_followers?: boolean
+		n_populates?: boolean
+		n_new_post?: boolean
+		n_edit_post?: boolean
+		n_delete_post?: boolean
+		n_email_comments?: boolean
+		n_email_followers?: boolean
+		n_email_ratings?: boolean
+		n_email_new_post?: boolean
+		n_email_edit_post?: boolean
+		n_email_delete_post?: boolean
+	}
+}
+
+export type ResponseOK = {
+	response: string
+}
+
+export type SendEmailCode = {
+	sendRecoveryCode: ResponseOK 
+}
+
+export type VerifyCode = {
+	verifyCode: ResponseOK 
+}
+
+export type VerifyCodeVariables = {
+	email: string
+	code: string
+}
+
+export type ResetPassword = {
+	changePassword: ResponseOK 
+}
+
+export type ResetPasswordVariables = {
+	email: string
+	password: string
 }
