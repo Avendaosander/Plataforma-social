@@ -8,37 +8,45 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  username    String   @unique
-  password    String
-  description String   @default("")
-  avatar      String   @default("")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(uuid())
+  email          String   @unique
+  username       String   @unique
+  password       String
+  recoveryCode   String   @default("")
+  description    String   @default("")
+  avatar         String   @default("")
+  subscriptionWP String   @default("") @db.VarChar(500)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  Setting      Setting?
-  Post         Post[]
-  Comment      Comment[]
-  Rating       Rating[]
-  followers    Follower[]     @relation("UserFollowers")
-  following    Follower[]     @relation("UserFollowing")
-  Post_saved   Post_saved[]
-  Notification Notification[]
+  Setting    Setting?
+  Post       Post[]
+  Comment    Comment[]
+  Rating     Rating[]
+  followers  Follower[]     @relation("UserFollowers")
+  following  Follower[]     @relation("UserFollowing")
+  Post_saved Post_saved[]
+  user       Notification[] @relation("User")
+  userSend   Notification[] @relation("UserSend")
 }
 
 model Setting {
-  idSetting         String  @id @default(uuid())
-  user              User    @relation(fields: [idUser], references: [id], onDelete: Cascade)
-  idUser            String  @unique
-  private           Boolean @default(false)
-  n_ratings         Boolean @default(true)
-  n_comments        Boolean @default(true)
-  n_followers       Boolean @default(true)
-  n_populates       Boolean @default(true)
-  n_email_ratings   Boolean @default(true)
-  n_email_comments  Boolean @default(true)
-  n_email_followers Boolean @default(true)
+  idSetting           String  @id @default(uuid())
+  user                User    @relation(fields: [idUser], references: [id], onDelete: Cascade)
+  idUser              String  @unique
+  n_ratings           Boolean @default(true)
+  n_comments          Boolean @default(true)
+  n_followers         Boolean @default(true)
+  n_populates         Boolean @default(true)
+  n_new_post          Boolean @default(true)
+  n_edit_post         Boolean @default(true)
+  n_delete_post       Boolean @default(true)
+  n_email_ratings     Boolean @default(true)
+  n_email_comments    Boolean @default(true)
+  n_email_followers   Boolean @default(true)
+  n_email_new_post    Boolean @default(true)
+  n_email_edit_post   Boolean @default(true)
+  n_email_delete_post Boolean @default(true)
 }
 
 model Post {
@@ -85,11 +93,13 @@ model Stack {
 }
 
 model Rating {
-  post   Post   @relation(fields: [idPost], references: [id], onDelete: Cascade)
-  idPost String
-  user   User   @relation(fields: [idUser], references: [id], onDelete: Cascade)
-  idUser String
-  rating Float
+  post      Post     @relation(fields: [idPost], references: [id], onDelete: Cascade)
+  idPost    String
+  user      User     @relation(fields: [idUser], references: [id], onDelete: Cascade)
+  idUser    String
+  rating    Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@id([idPost, idUser])
 }
@@ -100,6 +110,8 @@ model Follower {
 
   following   User   @relation("UserFollowing", fields: [idFollowing], references: [id], onDelete: Cascade)
   idFollowing String
+
+  createdAt DateTime @default(now())
 
   @@id([idFollower, idFollowing])
 }
@@ -112,19 +124,23 @@ model File {
 }
 
 model Post_saved {
-  user   User   @relation(fields: [idUser], references: [id], onDelete: Cascade)
-  idUser String
-  post   Post   @relation(fields: [idPost], references: [id], onDelete: Cascade)
-  idPost String
+  user      User     @relation(fields: [idUser], references: [id], onDelete: Cascade)
+  idUser    String
+  post      Post     @relation(fields: [idPost], references: [id], onDelete: Cascade)
+  idPost    String
+  createdAt DateTime @default(now())
 
   @@id([idPost, idUser])
 }
 
 model Notification {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [idUser], references: [id], onDelete: Cascade)
-  idUser    String
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id         String   @id @default(uuid())
+  user       User     @relation("User", fields: [idUser], references: [id], onDelete: Cascade)
+  idUser     String
+  userSend   User     @relation("UserSend", fields: [idUserSend], references: [id], onDelete: Cascade)
+  idUserSend String
+  message    String
+  link       String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
 }

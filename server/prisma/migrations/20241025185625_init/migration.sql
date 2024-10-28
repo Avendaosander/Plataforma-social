@@ -7,6 +7,7 @@ CREATE TABLE `User` (
     `recoveryCode` VARCHAR(191) NOT NULL DEFAULT '',
     `description` VARCHAR(191) NOT NULL DEFAULT '',
     `avatar` VARCHAR(191) NOT NULL DEFAULT '',
+    `subscriptionWP` VARCHAR(500) NOT NULL DEFAULT '',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -19,14 +20,19 @@ CREATE TABLE `User` (
 CREATE TABLE `Setting` (
     `idSetting` VARCHAR(191) NOT NULL,
     `idUser` VARCHAR(191) NOT NULL,
-    `private` BOOLEAN NOT NULL DEFAULT false,
     `n_ratings` BOOLEAN NOT NULL DEFAULT true,
     `n_comments` BOOLEAN NOT NULL DEFAULT true,
     `n_followers` BOOLEAN NOT NULL DEFAULT true,
     `n_populates` BOOLEAN NOT NULL DEFAULT true,
+    `n_new_post` BOOLEAN NOT NULL DEFAULT true,
+    `n_edit_post` BOOLEAN NOT NULL DEFAULT true,
+    `n_delete_post` BOOLEAN NOT NULL DEFAULT true,
     `n_email_ratings` BOOLEAN NOT NULL DEFAULT true,
     `n_email_comments` BOOLEAN NOT NULL DEFAULT true,
     `n_email_followers` BOOLEAN NOT NULL DEFAULT true,
+    `n_email_new_post` BOOLEAN NOT NULL DEFAULT true,
+    `n_email_edit_post` BOOLEAN NOT NULL DEFAULT true,
+    `n_email_delete_post` BOOLEAN NOT NULL DEFAULT true,
 
     UNIQUE INDEX `Setting_idUser_key`(`idUser`),
     PRIMARY KEY (`idSetting`)
@@ -78,6 +84,8 @@ CREATE TABLE `Rating` (
     `idPost` VARCHAR(191) NOT NULL,
     `idUser` VARCHAR(191) NOT NULL,
     `rating` DOUBLE NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`idPost`, `idUser`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -86,6 +94,7 @@ CREATE TABLE `Rating` (
 CREATE TABLE `Follower` (
     `idFollower` VARCHAR(191) NOT NULL,
     `idFollowing` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`idFollower`, `idFollowing`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -103,6 +112,7 @@ CREATE TABLE `File` (
 CREATE TABLE `Post_saved` (
     `idUser` VARCHAR(191) NOT NULL,
     `idPost` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`idPost`, `idUser`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -111,7 +121,9 @@ CREATE TABLE `Post_saved` (
 CREATE TABLE `Notification` (
     `id` VARCHAR(191) NOT NULL,
     `idUser` VARCHAR(191) NOT NULL,
+    `idUserSend` VARCHAR(191) NOT NULL,
     `message` VARCHAR(191) NOT NULL,
+    `link` VARCHAR(191) NOT NULL,
     `read` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
@@ -159,3 +171,6 @@ ALTER TABLE `Post_saved` ADD CONSTRAINT `Post_saved_idPost_fkey` FOREIGN KEY (`i
 
 -- AddForeignKey
 ALTER TABLE `Notification` ADD CONSTRAINT `Notification_idUser_fkey` FOREIGN KEY (`idUser`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Notification` ADD CONSTRAINT `Notification_idUserSend_fkey` FOREIGN KEY (`idUserSend`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
