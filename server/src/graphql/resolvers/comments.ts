@@ -1,6 +1,8 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { GraphQLError } from "graphql"
 import { Context } from "../../types"
+import { pushNotification } from "../../lib/functions.js"
+import { MESSAGE } from "../../lib/constant.js"
 
 const prisma = new PrismaClient()
 
@@ -20,7 +22,7 @@ export const getComments = async (_: any, { id }: { id: string }, context: Conte
         idPost: id
       },
       orderBy: {
-        createdAt: "asc"
+        createdAt: "desc"
       },
       include: {
         user: {
@@ -69,6 +71,24 @@ export const postComment = async (_: any, { idPost, idUser, text }: { idPost: st
       })
     }
 
+    const findPost = await prisma.post.findUnique({
+      where: {id: idPost},
+      include: {
+        user: {
+          select: {
+            email: true,
+            subscriptionWP: true,
+            Setting: {
+              select: {
+                n_comments: true,
+                n_email_comments: true
+              }
+            }
+          },
+        }
+      }
+    })
+
     const newComment = await prisma.comment.create({
       data: {
         idUser,
@@ -84,6 +104,21 @@ export const postComment = async (_: any, { idPost, idUser, text }: { idPost: st
           }
         }
       }
+    })
+    
+    const link = `home/post/${idPost}`
+
+    const notification = await pushNotification({
+      idUser: findPost.idUser,
+      idUserSend: idUser,
+      username: newComment.user.username,
+      email: findPost.user.email,
+      title: 'Nuevo comentario',
+      message: MESSAGE.NEW_COMMENT,
+      subscription: findPost.user.subscriptionWP,
+      link,
+      sendPush: findPost.user.Setting.n_comments,
+      sendEmail: findPost.user.Setting.n_email_comments,
     })
   
     return newComment

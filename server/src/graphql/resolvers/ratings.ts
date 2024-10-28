@@ -1,6 +1,8 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { GraphQLError } from "graphql"
 import { Context } from "../../types"
+import { pushNotification } from "../../lib/functions.js"
+import { MESSAGE } from "../../lib/constant.js"
 
 const prisma = new PrismaClient()
 
@@ -40,7 +42,47 @@ export const postRating = async (
         idPost,
         idUser,
         rating
+      },
+      include: {
+        post: {
+          include: {
+            user: {
+              select: {
+                email: true,
+                subscriptionWP: true,
+                Setting: {
+                  select: {
+                    n_comments: true,
+                    n_email_comments: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        user: {
+          select: {
+            username: true
+          }
+        }
       }
+    })
+
+    
+    const link = `home/post/${idPost}`
+
+    const notification = await pushNotification({
+      idUser: newRating.post.idUser,
+      idUserSend: idUser,
+      username: newRating.user.username,
+      email: newRating.post.user.email,
+      title: 'Nueva calificacion',
+      message: MESSAGE.NEW_RATING,
+      message2: `${newRating.rating}`,
+      subscription: newRating.post.user.subscriptionWP,
+      link,
+      sendPush: newRating.post.user.Setting.n_comments,
+      sendEmail: newRating.post.user.Setting.n_email_comments,
     })
 
     return newRating

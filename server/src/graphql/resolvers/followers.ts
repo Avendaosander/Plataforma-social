@@ -1,8 +1,8 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { GraphQLError } from "graphql"
 import { Context } from "../../types.js"
-import { wsPublish } from "../../lib/functions.js"
-import { MESSAGE, SUBSCRIPTIONS_EVENTS } from "../../lib/constant.js"
+import { pushNotification } from "../../lib/functions.js"
+import { MESSAGE } from "../../lib/constant.js"
 
 const prisma = new PrismaClient()
 
@@ -57,6 +57,8 @@ export const postFollower = async (_: any, {idFollower, idFollowing}: {idFollowe
       })
     }
 
+    console.log('Auth: ', context.id)
+
     const existingFollower = await prisma.follower.findUnique({
       where: {
         idFollower_idFollowing: {
@@ -81,18 +83,43 @@ export const postFollower = async (_: any, {idFollower, idFollowing}: {idFollowe
         idFollowing
       },
       include: {
-        follower: true
+        follower: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true
+          }
+        },
+        following: {
+          select: {
+            email: true,
+            username: true,
+            subscriptionWP: true,
+            Setting: {
+              select: {
+                n_followers: true,
+                n_email_followers: true,
+              }
+            }
+          }
+        }
       }
-    });
+    })
+  
+    const link = `home/profile/${follower.idFollower}`
 
-		await wsPublish({
-			subscriptionName: SUBSCRIPTIONS_EVENTS.NEW_FOLLOWER,
-			payloadName: 'newFollower',
-			id: idFollowing,
-			username: follower.follower.username,
-			message: MESSAGE.NEW_FOLLOWER,
-      link: `${process.env.FRONTEND_URL}home/profile/${follower.idFollower}`
-		})
+    const notification = await pushNotification({
+      idUser: follower.idFollowing,
+      idUserSend: follower.idFollower,
+      username: follower.follower.username,
+      email: follower.following.email,
+      title: 'Nuevo seguidor',
+      message: MESSAGE.NEW_FOLLOWER,
+      subscription: follower.following.subscriptionWP,
+      link,
+      sendPush: follower.following.Setting.n_followers,
+      sendEmail: follower.following.Setting.n_email_followers,
+    })
 
     return follower
   } catch (error) {
