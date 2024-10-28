@@ -4,7 +4,7 @@ import { Context } from "../../types"
 
 const prisma = new PrismaClient()
 
-export const getPostsSaved = async (_: any, { idUser }: { idUser: string }, context: Context) => {
+export const getPostsSaved = async (_: any, { idUser, cursor, take  }: { idUser: string, cursor?: string, take?: number }, context: Context) => {
   try {
     if (!context.auth) {
       throw new GraphQLError("Not authenticated", {
@@ -15,8 +15,17 @@ export const getPostsSaved = async (_: any, { idUser }: { idUser: string }, cont
       })
     }
 
+		const limit = take || 5;
+
     const posts = await prisma.post_saved.findMany({
-      where: { idUser },
+      where: { 
+        idUser,
+				...(cursor && {
+					createdAt: {
+						lt: new Date(parseInt(cursor)),
+					},
+				}),
+      },
       include: {
         user: {
           select: {
@@ -40,11 +49,19 @@ export const getPostsSaved = async (_: any, { idUser }: { idUser: string }, cont
             File: true,
           }
         }
-      }
+      },
+			orderBy: {
+				createdAt: "desc"
+			},
+			take: limit + 1
     });
 
+		const hasMore = posts.length > limit;
+    
+		const limitedPosts = hasMore ? posts.slice(0, limit) : posts;
+
     const postsWithDetails = await Promise.all(
-			posts.map(async (post) => {
+			limitedPosts.map(async (post) => {
 				const averageRating = await prisma.rating.aggregate({
 					where: {
 						idPost: post.post.id,
@@ -71,13 +88,12 @@ export const getPostsSaved = async (_: any, { idUser }: { idUser: string }, cont
 						},
 					},
 				})
-        console.log(isFollowing)
         
         const postFormated = {
           ...post.post,
 					comments: post.post._count.Comment,
 					saved: post.post._count.Post_saved,
-					rating: averageRating._avg.rating || 0,
+					rating: averageRating._avg.rating?.toFixed(1) || 0,
 					isFollowing: !!isFollowing,
 					isSaved: !!isSaved,
 
@@ -87,9 +103,13 @@ export const getPostsSaved = async (_: any, { idUser }: { idUser: string }, cont
           post: postFormated
 				};
 			})
-		);
-		
-		return postsWithDetails
+		)
+    
+		return {
+			posts: postsWithDetails,
+			cursor: limitedPosts.length > 0 ? limitedPosts[limitedPosts.length - 1].createdAt.getTime().toString() : null,
+			hasMore
+		}
   } catch (error) {
     if (error instanceof GraphQLError) {
       // Re-lanzar errores conocidos de GraphQL

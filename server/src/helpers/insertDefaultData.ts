@@ -8,19 +8,19 @@ function getRandomDate(start: Date, end: Date): Date {
 }
 
 function getRandomItems<T>(array: T[], count: number): T[] {
-  const shuffled = array.sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
+  const shuffled = array.sort(() => 0.5 - Math.random())
+  return shuffled.slice(0, count)
 }
 
-const startDate = new Date('2020-01-01'); // Fecha de inicio (1 de enero de 2020)
-const endDate = new Date(); // Fecha actual
+const startDate = new Date('2020-01-01')
+const endDate = new Date()
 
 export const defaultData = async () => {
   try {
     const userCount = await prisma.user.count();
 
     if (userCount < 2) {
-      const testPassword = '123'; // Contraseña común para todos los usuarios
+      const testPassword = '123'
       const hashedPassword = await bcrypt.hash(testPassword, 10);
 
       const newUsers = Array.from({ length: 20 }, (_, index) => ({
@@ -42,20 +42,19 @@ export const defaultData = async () => {
 
       const usersID = usersCreated.map(user => ({ idUser: user.id }));
 
-      // Inserción de configuración para cada usuario
       await prisma.setting.createMany({
         data: usersID,
       });
 
-      let postCounter = 1; // Contador global para asegurar que los nombres de los posts no se repitan
+      let postCounter = 1
 
 			const posts = usersCreated.flatMap((user) => {
 				// Generar un número aleatorio de publicaciones entre 2 y 10 para cada usuario
 				const numberOfPosts = Math.floor(Math.random() * (5 - 2 + 1)) + 2;
 
 				return Array.from({ length: numberOfPosts }, () => {
-					const postName = `post${postCounter}`; // Generar nombre único para cada post
-					postCounter++; // Incrementar el contador para el siguiente post
+					const postName = `post${postCounter}`
+					postCounter++
 
 					return {
 						idUser: user.id,
@@ -77,7 +76,7 @@ export const defaultData = async () => {
       });
 
       const postsCreated = await prisma.post.findMany({
-        select: { id: true, title: true },
+        select: { id: true, title: true, createdAt: true },
       });
 
       const stacks = postsCreated.flatMap((post) => {
@@ -102,12 +101,13 @@ export const defaultData = async () => {
       const comments = postsCreated.flatMap((post) => {
         // Seleccionar al menos 5 usuarios para comentar en cada publicación
         const selectedUsers = getRandomItems(usersCreated, Math.min(4, usersCreated.length));
+        const datePost = new Date (post.createdAt.toISOString().split('T')[0])
 
         return selectedUsers.map((user, index) => ({
           idPost: post.id,
           idUser: user.id,
           text: `Comment ${index + 1} on post ${post.title} by user ${user.username}`,
-          createdAt: getRandomDate(startDate, endDate),
+          createdAt: getRandomDate(datePost, endDate),
         }));
       });
 
@@ -145,6 +145,7 @@ export const defaultData = async () => {
         return selectedPosts.map((postID) => ({
           idUser: user.id,
           idPost: postID,
+          createdAt: getRandomDate(startDate, endDate)
         }));
       });
 
@@ -162,7 +163,8 @@ export const defaultData = async () => {
         return selectedPosts.map((postID) => ({
           idPost: postID,
           idUser: user.id,
-          rating: parseFloat((Math.random() * 5).toFixed(1)), // Calificación entre 0 y 5 con un decimal
+          rating: parseFloat((Math.random() * 5).toFixed(1)),
+          createdAt: getRandomDate(startDate, endDate)
         }));
       });
 
@@ -182,10 +184,10 @@ export const defaultData = async () => {
         data: files,
       });
 
-      console.log('Data seeding completed successfully.');
+      console.log('Datos por defecto insertados');
     }
   } catch (error) {
-    console.error('Error seeding data:', error);
+    console.error('Error al insertar datos por defecto: ', error);
   } finally {
     await prisma.$disconnect();
   }
