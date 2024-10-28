@@ -4,11 +4,20 @@ self.addEventListener("push", event => {
 	self.registration.showNotification(data.title, {
 		body: data.message,
 		icon: "/Logo/main-logo.png",
-    data: { data: data.url },
+    data: { url: data.url },
 	})
+
+	setTimeout(() => {
+    self.registration.getNotifications().then(notifications => {
+      notifications.forEach(notification => {
+        notification.close()
+      });
+    });
+  }, 20000)
 })
 
 self.addEventListener("notificationclick", event => {
 	event.notification.close()
-	event.waitUntil(clients.openWindow(event.notification.data.url))
+  const urlToOpen = event.notification.data.url
+  event.waitUntil(clients.openWindow(urlToOpen))
 })
