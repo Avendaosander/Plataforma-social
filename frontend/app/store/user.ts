@@ -1,9 +1,8 @@
 import { create } from "zustand";
-import { type Setting, type GetUser, LoginClass, PutUser, Follower } from "@/typesGraphql";
+import { type GetUser, LoginClass, PutUser } from "@/typesGraphql";
 
 interface State {
   user: GetUser,
-  Setting: Setting
   updateState: (user: LoginClass) => void
   updateInfoUser: (user: PutUser) => void
 }
@@ -17,17 +16,6 @@ export const useUserStore = create<State>((set) => {
       avatar: '',
       description: ''
     },
-    Setting: {
-      idSettings: '',
-      private: false,
-      n_ratings: false,
-      n_comments: false,
-      n_followers: false,
-      n_populates: false,
-      n_email_comments: false,
-      n_email_followers: false,
-      n_email_ratings: false,
-    },
     updateState: (user) => {
       set({
         user: {
@@ -37,7 +25,6 @@ export const useUserStore = create<State>((set) => {
           avatar: user.avatar,
           description: user.description,
         },
-        Setting: user.Setting,
       })
     },
     updateInfoUser: (user) => {

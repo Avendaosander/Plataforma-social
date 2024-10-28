@@ -1,5 +1,4 @@
 import "next-auth"
-import { Setting } from "./app/lib/types/typesGraphql"
 
 declare module "next-auth" {
 	interface User {
@@ -8,7 +7,6 @@ declare module "next-auth" {
 		email: string
 		avatar: string
 		description: string
-		Setting: Setting
 		token: string
 	}
 	interface Session {

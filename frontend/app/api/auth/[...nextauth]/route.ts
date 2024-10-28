@@ -77,7 +77,6 @@ export const authOptions: NextAuthOptions = {
           username: user.username,
           avatar: user.avatar,
           description: user.description,
-          Setting: user.Setting,
           token: user.token
         }
       }
@@ -93,7 +92,6 @@ export const authOptions: NextAuthOptions = {
           username: token.username,
           avatar: token.avatar,
           description: token.description,
-          Setting: token.Setting
         },
         token: token.token
       }
