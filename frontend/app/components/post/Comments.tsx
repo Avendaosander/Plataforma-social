@@ -3,15 +3,18 @@ import InputWithIcon from '../ui/InputWithIcon'
 import MessagePlusIcon from '../icons/MessagePlusIcon'
 import { CommentsWithData } from '@/app/lib/types/typesGraphql'
 import Comment from './Comment'
+import { useUserStore } from '@/app/store/user'
 
 interface CommentsProps {
   comments: CommentsWithData[]
   submitComment: (text: string) => void
   deleteComment: (id: string) => void
+  isAutor: boolean
 }
 
-function Comments({ comments, submitComment, deleteComment }: CommentsProps) {
+function Comments({ comments, submitComment, deleteComment, isAutor }: CommentsProps) {
   const [text, setText] = useState('')
+	const idUser = useUserStore(state => state.user.id)
 
   const handleChange = (text: string) => {
     setText(text)
@@ -25,7 +28,7 @@ function Comments({ comments, submitComment, deleteComment }: CommentsProps) {
         </div>
         <div className="flex flex-col gap-3 py-5 border-t border-white/40 w-full h-full overflow-y-auto scrollbar-thin">
           {comments.map(comment => (
-            <Comment key={comment.id} comment={comment}/>
+            <Comment key={comment.id} comment={comment} onDelete={deleteComment} authorizated={idUser == comment.idUser} isAutor={isAutor}/>
           ))}
         </div>
         <InputWithIcon text={text} setText={setText} handleChange={handleChange} endContent={<MessagePlusIcon/>} onSubmit={submitComment} type="text" placeholder="Deja tu comentario aqui"/>
