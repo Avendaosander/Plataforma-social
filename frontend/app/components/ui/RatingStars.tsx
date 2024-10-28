@@ -6,7 +6,7 @@ function RatingStars({rating}: {rating: number}) {
   const maxRating = 5
 
   return (
-    <div className="flex gap-1 items-center">
+    <div className="flex gap-1 items-center -z-10">
       {[...Array(maxRating)].map((_, index) => {
         const ratingValue = index + 1;
 
