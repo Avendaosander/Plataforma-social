@@ -5,11 +5,14 @@ import BookmarkPlusIcon from "./BookmarkPlusIcon";
 import BookmarksIcon from "./BookmarksIcon";
 import CheckIcon from "./CheckIcon";
 import ComponentsIcon from "./ComponentsIcon";
+import CopyIcon from "./CopyIcon";
 import DotsIcon from "./DotsIcon";
 import EditIcon from "./EditIcon";
+import FacebookIcon from "./FacebookIcon";
 import FilterIcon from "./FilterIcon";
 import HomeIcon from "./HomeIcon";
 import InfoIcon from "./InfoIcon";
+import InstagramIcon from "./InstagramIcon";
 import LightIcon from "./LightIcon";
 import LogoutIcon from "./LogoutIcon";
 import MenuIcon from "./MenuIcon";
@@ -23,10 +26,12 @@ import SettingsIcon from "./SettingsIcon";
 import ShareIcon from "./ShareIcon";
 import ShareRightIcon from "./ShareRightIcon";
 import StarIcon from "./StarIcon";
+import TelegramIcon from "./TelegramIcon";
 import TrashIcon from "./TrashIcon";
 import TrendingIcon from "./TrendingIcon";
 import UserCheck from "./UserCheckIcon";
 import UserIcon from "./UserIcon";
+import WhatsAppIcon from "./WhatsAppIcon";
 import XIcon from "./XIcon";
 
 export {
@@ -59,5 +64,10 @@ export {
   MessagePlusIcon,
   CheckIcon,
   RightArrowIcon,
-  InfoIcon
+  InfoIcon,
+  CopyIcon,
+  WhatsAppIcon,
+  FacebookIcon,
+  InstagramIcon,
+  TelegramIcon
 }

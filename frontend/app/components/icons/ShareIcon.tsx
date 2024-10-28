@@ -1,6 +1,9 @@
 import React from "react"
+interface ShareIconProps extends React.SVGProps<SVGSVGElement> {
+  className?: string;
+}
 
-function ShareIcon({ className } : { className?: string}) {
+function ShareIcon({className, ...props }: ShareIconProps) {
 	return (
 		<svg
       className={className}
@@ -12,6 +15,7 @@ function ShareIcon({ className } : { className?: string}) {
 			strokeWidth='1.5'
 			strokeLinecap='round'
 			strokeLinejoin='round'
+      {...props}
 		>
 			<path
 				stroke='none'

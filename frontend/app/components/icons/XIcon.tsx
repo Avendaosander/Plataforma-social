@@ -1,6 +1,9 @@
 import React from "react"
+interface XIconProps extends React.SVGProps<SVGSVGElement> {
+  className?: string;
+}
 
-function XIcon({ className } : { className?: string}) {
+function XIcon({className, ...props }: XIconProps) {
 	return (
 		<svg
       className={className}
@@ -12,6 +15,7 @@ function XIcon({ className } : { className?: string}) {
 			strokeWidth='1.5'
 			strokeLinecap='round'
 			strokeLinejoin='round'
+			{...props}
 		>
 			<path
 				stroke='none'
