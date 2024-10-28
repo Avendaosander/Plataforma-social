@@ -27,7 +27,7 @@ export const subscription = async (userId: string) => {
 		userId
 	} 
 
-  await fetch(`${process.env.NEXT_PUBLIC_API_ROUTE_SUBSCRIPTION}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_ROUTE_SUBSCRIPTION}`, {
 		method: "POST",
 		body: JSON.stringify(body),
 		headers: {

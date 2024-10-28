@@ -4,27 +4,24 @@ import React, { useState } from "react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
-import { useMutation, useQuery } from "@apollo/client"
+import { useMutation } from "@apollo/client"
 import { PostFollower, DataPosts, DeleteFollower, postPostSaved, deletePostSaved, PostSavedInput } from "@/typesGraphql"
 import { getTimeElapsed, truncateText } from "@/app/lib/logic"
 import Button from "./Button"
 import {
-	BookmarkPlusIcon,
 	ShareIcon,
 	MessageIcon,
-	StarIcon,
-	UserIcon
+	XIcon,
 } from "@/icons"
 import {
 	DELETE_FOLLOWER,
-	GET_FOLLOWERS,
 	POST_FOLLOWER
 } from "@/app/lib/graphql/followers"
-import { GET_USER } from "@/app/lib/graphql/users"
 import ButtonBookmark from "./ButtonBookmark"
 import { DELETE_POST_SAVED, POST_POST_SAVED } from "@/app/lib/graphql/posts_saveds"
 import RatingStars from "./RatingStars"
 import { useFilterSearchStore } from "@/app/store/filterSearch"
+import ShareModal from "./ShareModal"
 
 interface PropsCardPost {
 	post: DataPosts
@@ -41,6 +38,17 @@ function CardPost({
 }: PropsCardPost) {
 	const { data: sessionData } = useSession()
 	const setFilter = useFilterSearchStore(state => state.setFilterSearh)
+	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+	const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+	const shareUrl = `${process.env.NEXT_PUBLIC_URL}home/post/${post.id}`
+
+  const togglePreview = () => {
+    document.startViewTransition?.(() => setIsPreviewOpen(!isPreviewOpen));
+  };
+	
+	const closePreview = () => {
+    document.startViewTransition?.(() => setIsPreviewOpen(false));
+  }
 
 	const [postFollower, { data: followers, error: errorFollowers }] =
 		useMutation<PostFollower>(POST_FOLLOWER)
@@ -205,10 +213,28 @@ function CardPost({
 							shape='full'
 							size='sm'
 							className='px-3 py-0.5'
+          		onClick={togglePreview}
 						>
 							Vista Previa
 						</Button>
 					</div>
+					{isPreviewOpen && (
+						<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-20" onClick={closePreview}>
+							<XIcon
+								className="absolute top-5 right-5 text-white text-xl font-bold cursor-pointer z-20"
+								onClick={closePreview}
+							/>
+							<div className="relative" onClick={(e) => e.stopPropagation()}>
+								<Image
+									src={previewSrc}
+									alt={post.title}
+									width={500}
+									height={500}
+									className="transition-transform duration-500 ease-in-out transform scale-100"
+								/>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 			<footer className='border-t border-seagreen-950/40 dark:border-white/40 flex justify-between px-3 pt-3'>
@@ -219,12 +245,18 @@ function CardPost({
 					<MessageIcon className='size-5' />
 					<p className='font-light'>{post.comments}</p>
 				</div>
-				<ShareIcon className='size-5' />
+				<ShareIcon className='size-5 cursor-pointer' onClick={() => setIsShareModalOpen(true)}/>
 				<div className='flex gap-1 items-center'>
 					<p className='font-light'>{post.saved}</p>
 					<ButtonBookmark isSaved={post.isSaved} handlePostSaved={handleFetchPostSaved}/>
 				</div>
 			</footer>
+			{isShareModalOpen && (
+				<ShareModal
+					onClose={() => setIsShareModalOpen(false)}
+					shareUrl={shareUrl}
+				/>
+			)}
 		</article>
 	)
 }
