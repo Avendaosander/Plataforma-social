@@ -84,6 +84,10 @@ const config: Config = {
       boxShadow: {
         'small': '0 4px 4px 2px rgba(0, 0, 0, 0.25)',
         'medium': '0 2px 8px 0px rgba(255, 255, 255, 0.75)',
+      },
+      screens: {
+        'xs': '320px',
+        'xxl': '1100px',
       }
     },
   },

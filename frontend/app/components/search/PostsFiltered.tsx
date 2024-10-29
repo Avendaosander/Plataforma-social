@@ -15,7 +15,6 @@ interface PropsPostsFiltered {
 function PostsFiltered({ search, rating }: PropsPostsFiltered) {
 	const filterSearh = useFilterSearchStore(state => state.filterSearh)
 	const filterObject = arrayToFilterObject(filterSearh.filter, search, rating)
-	console.log('filter: ', filterObject)
   const { data, loading, error, fetchMore } = useQuery<GetPostsFilter>(
 		GET_POSTS_FILTER,
 		{
@@ -29,9 +28,8 @@ function PostsFiltered({ search, rating }: PropsPostsFiltered) {
 	const [posts, setPosts] = useState<DataPosts[]>([])
 	const [cursor, setCursor] = useState('')
 	const [hasMore, setHasMore] = useState(false)
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false)
 
-  console.log(data?.getPostsFilter.posts)
 	const handleFollowing = (idUser: string, isFollowing: boolean) => {
 		setPosts(prevPosts =>
 			prevPosts.map(post =>

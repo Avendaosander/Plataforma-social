@@ -2,6 +2,7 @@
 import PlusIcon from '@/app/components/icons/PlusIcon'
 import Button from '@/app/components/ui/Button'
 import CardPost from '@/app/components/ui/CardPost'
+import FiltersResponsive from '@/app/components/ui/FiltersResponsive'
 import InputSearch from '@/app/components/ui/InputSearch'
 import { GET_POSTS_FOLLOWINGS } from '@/app/lib/graphql/posts'
 import { DataPosts, GetPostsFollowings } from '@/app/lib/types/typesGraphql'
@@ -35,7 +36,6 @@ function Page() {
 
 	useEffect(() => {
 		if (data?.getPostsFollowings) {
-			console.log(data.getPostsFollowings.posts)
       setPosts((prevPosts) => [...prevPosts, ...data.getPostsFollowings.posts]);
 			setCursor(data.getPostsFollowings.cursor)
 			setHasMore(data.getPostsFollowings.hasMore)
@@ -62,7 +62,12 @@ function Page() {
   return (
 		<>
 			<section className='flex flex-col h-full items-center w-full gap-5'>
-				<InputSearch />
+				<div className='flex flex-col justify-center items-center w-full max-w-md'>
+					<InputSearch />
+					<div className='md:hidden flex items-center justify-center border-b border-white/40 w-full'>
+						<FiltersResponsive/>
+				</div>
+				</div>
 				{posts?.length == 0 ? (
 					<div>
 						<p>Los usuarios que sigues aun no publican sus componentes</p>
@@ -90,10 +95,12 @@ function Page() {
 			</section>
 			<Link href={"/home/create"}>
 				<Button
-					className='fixed bottom-5 right-5 px-3'
+					className='fixed bottom-12 md:bottom-5 right-5 px-3'
 					startContent={<PlusIcon />}
 				>
-					Crear
+					<p className="hidden lg:block">
+						Crear
+					</p>
 				</Button>
 			</Link>
 		</>

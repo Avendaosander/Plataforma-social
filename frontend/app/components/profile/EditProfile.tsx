@@ -94,7 +94,6 @@ function EditProfile({ onClose, user }: Props) {
 				.then(res => res.json())
 				.then(res => res)
 
-			console.log(res)
 			if (res) {
 				toastCustom({
 					text: "Avatar modificado correctamente",
@@ -128,13 +127,12 @@ function EditProfile({ onClose, user }: Props) {
 	}
 
 	if (error) {
-		// console.log(error)
 		toastCustom({ text: error.message, variant: "error", duration: 2000 })
 		reset()
 	}
 
 	return (
-		<section className='flex flex-col bg-storm-50 dark:bg-storm-950 rounded-xl max-w-4xl w-full'>
+		<section className='flex flex-col bg-storm-50 dark:bg-storm-950 rounded-xl max-w-[90%] sm:max-w-[80%] lg:max-w-[60%] w-full'>
 			<header className='flex justify-between items-center p-5 border-b border-seagreen-950/40 dark:border-white/20'>
 				<h3 className='text-2xl font-semibold'>Editar perfil</h3>
 				<button onClick={() => onClose(false)}>
@@ -142,10 +140,10 @@ function EditProfile({ onClose, user }: Props) {
 				</button>
 			</header>
 			<div className='flex flex-col px-5'>
-				<div className='flex justify-between py-5'>
+				<div className='flex flex-col md:flex-row justify-between items-center py-2 md:py-5 gap-3'>
 					<label
 						htmlFor='avatar'
-						className='w-full max-w-[160px] mb-auto text-lg font-semibold'
+						className='md:w-full md:max-w-[160px] mb-auto text-lg font-semibold'
 					>
 						Foto de perfil
 					</label>
@@ -173,10 +171,10 @@ function EditProfile({ onClose, user }: Props) {
 					</section>
 					<div className='w-full max-w-[150px]'></div>
 				</div>
-				<div className='flex justify-between py-5'>
+				<div className='flex flex-col md:flex-row justify-between items-center py-2 md:py-5 gap-3'>
 					<label
 						htmlFor='username'
-						className='w-full max-w-[160px] text-lg font-semibold'
+						className='md:w-full md:max-w-[160px] text-lg font-semibold'
 					>
 						Nombre de usuario
 					</label>
@@ -191,10 +189,10 @@ function EditProfile({ onClose, user }: Props) {
 					/>
 					<div className='w-full max-w-[150px]'></div>
 				</div>
-				<div className='flex justify-between py-5'>
+				<div className='flex flex-col md:flex-row justify-between items-center py-2 md:py-5 gap-3'>
 					<label
 						htmlFor='description'
-						className='w-full max-w-[160px] text-lg font-semibold'
+						className='md:w-full md:max-w-[160px] text-lg font-semibold'
 					>
 						Descripcion corta
 					</label>
@@ -214,7 +212,7 @@ function EditProfile({ onClose, user }: Props) {
 					<div className='w-full max-w-[150px]'></div>
 				</div>
 			</div>
-			<footer className='flex justify-end gap-5 p-5 border-t border-seagreen-950/40 dark:border-white/20'>
+			<footer className='flex justify-center md:justify-end gap-5 p-5 border-t border-seagreen-950/40 dark:border-white/20'>
 				<Button
 					color='destructive'
 					variant='solid'

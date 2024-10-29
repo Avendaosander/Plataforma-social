@@ -104,7 +104,7 @@ function Settings() {
 				size='sm'
 				shape='sm'
 				startContent={<ArrowLeft />}
-				className='px-2 py-1 absolute right-full top-[74px] mr-10'
+				className='px-2 py-1 absolute right-0 lg:right-full top-[74px] mr-10 z-10'
 				onClick={goToHome}
 			></Button>
 			<section className='flex flex-col items-center w-full gap-5'>
@@ -122,7 +122,7 @@ function Settings() {
 			</section>
 			{settings && (
 				<div className='flex gap-5 w-full h-full px-2'>
-					<section className='flex flex-col w-64 p-5 bg-white dark:bg-storm-900 rounded-t-2xl'>
+					<section className=' hidden md:flex flex-col w-64 p-5 bg-white dark:bg-storm-900 rounded-t-2xl'>
 						<Link
 							href='#administrar-cuenta'
 							className={`${
@@ -144,7 +144,7 @@ function Settings() {
 							Notificaciones
 						</Link>
 					</section>
-					<section className='flex flex-col gap-3 w-full p-5 bg-white dark:bg-storm-900 rounded-t-2xl text-lg'>
+					<section className='flex flex-col gap-3 w-full p-5 bg-white dark:bg-storm-900 rounded-t-2xl text-sm md:text-lg'>
 						<h4
 							className='text-xl font-bold'
 							id='administrar-cuenta'
@@ -165,21 +165,6 @@ function Settings() {
 								>
 									Eliminar
 								</Button>
-							</div>
-						</div>
-						<div className='border-b border-seagreen-900/20'></div>
-						<div className='flex flex-col gap-3 w-full px-3'>
-							<p className='font-semibold'>Datos de la cuenta</p>
-							<div className='flex justify-between items-center w-full'>
-								<p>Cambiar la contraseña</p>
-								<Button
-									color='primary'
-									variant='flat'
-									size='sm'
-									shape='sm'
-									startContent={<RightArrowIcon />}
-									className='px-2 py-1'
-								></Button>
 							</div>
 						</div>
 						<div className='border-b border-seagreen-900/20'></div>

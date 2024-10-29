@@ -76,7 +76,12 @@ const FormRecovery = () => {
 
   return (
 		<section className="flex flex-col items-center gap-5">
-			<h2 className='text-3xl font-semibold'>Enviar correo de confirmacion</h2>
+			<h2 className='text-xl md:text-3xl font-semibold text-center'>
+				{stage === 'otp'
+				? 'Enviar correo de confirmacion'
+				: 'Agrega tu contraseña nueva'
+			}
+			</h2>
 			<div className="text-lg font-medium p-5 rounded-2xl ring-1 ring-seagreen-950 dark:ring-white flex flex-col gap-5 w-[300px] bg-white dark:bg-transparent shadow-small shadow-white/25">
 				{stage === "otp" && (
 					<>

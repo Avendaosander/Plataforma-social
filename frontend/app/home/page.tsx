@@ -8,6 +8,7 @@ import Link from "next/link"
 import { useQuery } from "@apollo/client"
 import { GET_POSTS } from "../lib/graphql/posts"
 import { GetPosts, DataPosts } from "../lib/types/typesGraphql"
+import FiltersResponsive from "../components/ui/FiltersResponsive"
 
 function Home() {
 	const [posts, setPosts] = useState<DataPosts[]>([])
@@ -65,8 +66,13 @@ function Home() {
 
 	return (
 		<>
-			<section className='flex flex-col h-full items-center w-full gap-5'>
-				<InputSearch />
+			<section className='flex flex-col h-full items-center w-full  gap-5'>
+				<div className='flex flex-col justify-center items-center w-full max-w-md'>
+					<InputSearch />
+					<div className='md:hidden flex items-center justify-center border-b border-white/40 w-full'>
+						<FiltersResponsive/>
+					</div>
+				</div>
 				{posts?.length == 0 ? (
 					<div>
 						<p>No hay componentes de momento</p>
@@ -85,7 +91,7 @@ function Home() {
 				{loadingMore && <p className="py-2">Cargando más...</p>}
 				{(!loadingMore && posts.length >= 1 && hasMore) && (
 					<Button
-						className='px-3'
+						className='px-3 text-sm sm:text-base'
 						variant="flat"
 						onClick={() => morePosts()}
 					>
@@ -95,10 +101,12 @@ function Home() {
 			</section>
 			<Link href={"/home/create"}>
 				<Button
-					className='fixed bottom-5 right-5 px-3'
+					className='fixed bottom-12 md:bottom-5 right-5 px-3'
 					startContent={<PlusIcon />}
 				>
-					Crear
+					<p className="hidden lg:block">
+						Crear
+					</p>
 				</Button>
 			</Link>
 		</>

@@ -87,7 +87,7 @@ function InfoProfile({
 	}
 
 	return (
-		<>
+		<div className="flex flex-col md:flex-row items-center md:gap-10">
 			<Image
 				src={avatar}
 				alt='Avatar'
@@ -96,58 +96,62 @@ function InfoProfile({
 				className='aspect-square size-[120px]'
 			/>
 			<div className='flex flex-col gap-5'>
-				<div className='flex gap-6'>
+				<div className='flex flex-col md:flex-row items-center gap-2 md:gap-6'>
 					<h2 className='text-lg font-semibold'>{user?.username}</h2>
-					{isMyProfile ? (
+					<div className="flex gap-2 md:gap-6">
+						{isMyProfile ? (
+							<Button
+								color='primary'
+								variant='outline'
+								shape='sm'
+								className='px-5 py-1'
+								startContent={<EditIcon />}
+								onClick={() => {
+									handleEditMode(true)
+								}}
+							>
+								Editar Perfil
+							</Button>
+						) : (
+							<Button
+								color='primary'
+								variant={isFollowing ? "solid" : "outline"}
+								shape='sm'
+								className='px-5 py-1'
+								onClick={() => {
+									handleFollowing()
+								}}
+							>
+								{isFollowing ? "Siguiendo" : "Seguir"}
+							</Button>
+						)}
 						<Button
 							color='primary'
 							variant='outline'
 							shape='sm'
-							className='px-5 py-1'
-							startContent={<EditIcon />}
-							onClick={() => {
-								handleEditMode(true)
-							}}
-						>
-							Editar Perfil
-						</Button>
-					) : (
-						<Button
-							color='primary'
-							variant={isFollowing ? "solid" : "outline"}
-							shape='sm'
-							className='px-5 py-1'
-							onClick={() => {
-								handleFollowing()
-							}}
-						>
-							{isFollowing ? "Siguiendo" : "Seguir"}
-						</Button>
-					)}
-					<Button
-						color='primary'
-						variant='outline'
-						shape='sm'
-						className='px-1 py-1'
-						onClick={() => setIsShareModalOpen(true)}
-						startContent={<ShareRightIcon />}
-					></Button>
+							className='px-1 py-1'
+							onClick={() => setIsShareModalOpen(true)}
+							startContent={<ShareRightIcon />}
+						></Button>
+					</div>
 				</div>
-				<div className='flex gap-6'>
-					<p>
-						<span className='font-semibold'>{user._count.following}</span>{" "}
-						Seguidores
-					</p>
-					<p>
-						<span className='font-semibold'>{user._count.followers}</span>{" "}
-						Seguidos
-					</p>
-					<p>
-						<span className='font-semibold'>{user._count.Post}</span>{" "}
-						Componentes
-					</p>
+				<div className="flex flex-col-reverse md:flex-col gap-5">
+					<div className='flex gap-6'>
+						<p className="flex flex-col md:flex-row items-center md:gap-2">
+							<span className='font-semibold'>{user._count.following}</span>{" "}
+							Seguidores
+						</p>
+						<p className="flex flex-col md:flex-row items-center md:gap-2">
+							<span className='font-semibold'>{user._count.followers}</span>{" "}
+							Seguidos
+						</p>
+						<p className="flex flex-col md:flex-row items-center md:gap-2">
+							<span className='font-semibold'>{user._count.Post}</span>{" "}
+							Componentes
+						</p>
+					</div>
+					<p className='max-w-[60ch]'>{user?.description}</p>
 				</div>
-				<p className='max-w-[60ch]'>{user?.description}</p>
 			</div>
 			{isShareModalOpen && (
 				<ShareModal
@@ -155,7 +159,7 @@ function InfoProfile({
 					shareUrl={shareUrl}
 				/>
 			)}
-		</>
+		</div>
 	)
 }
 

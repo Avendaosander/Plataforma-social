@@ -9,9 +9,9 @@ function ButtonBookmark({ isSaved, handlePostSaved }: ButtonBookmarkProps) {
   return (
     <button className='flex' onClick={() => {handlePostSaved()}}>
       {isSaved ? (
-        <BookmarkFilled className='size-5 text-lima-400'/>
+        <BookmarkFilled className='size-4 sm:size-5 text-lima-400'/>
       ) : (
-        <BookmarkPlusIcon className='size-5' />
+        <BookmarkPlusIcon className='size-4 sm:size-5' />
       )}
     </button>
   )

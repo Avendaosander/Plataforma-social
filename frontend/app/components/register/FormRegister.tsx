@@ -69,9 +69,9 @@ function FormRegister() {
   
 	return (
 		<div className='flex flex-col gap-5 items-center'>
-			<h2 className='text-4xl font-semibold'>Registrate</h2>
+			<h2 className='text-2xl md:text-4xl font-semibold'>Registrate</h2>
 			<form
-				className='text-lg font-medium p-5 rounded-2xl ring-1 ring-seagreen-950 dark:ring-white flex flex-col gap-5 w-[300px] bg-white dark:bg-transparent shadow-small shadow-white/25'
+				className='text-sm sm:text-base md:text-lg font-medium p-5 rounded-2xl ring-1 ring-seagreen-950 dark:ring-white flex flex-col gap-5 w-[300px] bg-white dark:bg-transparent shadow-small shadow-white/25'
         onSubmit={e => handleSubmit(e)}
 			>
 				<div className='flex flex-col gap-1'>
@@ -82,6 +82,7 @@ function FormRegister() {
 						id='username'
             name="username"
 						value={register.username}
+						autoFocus
 						onChange={e => handleRegister(e)}
 					/>
 				</div>
@@ -122,16 +123,16 @@ function FormRegister() {
           type='submit'
           color='primary'
           variant='solid'
-          size='lg'
           marginX='auto'
           shape='md'
 					disabled={loading}
+					className="text-md md:text-lg"
         >
           Registrar
         </Button>
 			</form>
 			<Link href={`/login`}>
-				¿Tienes una cuenta? <span className='font-semibold'>Inicia sesion</span>
+				¿Tienes una cuenta? <span className='font-semibold text-sm sm:text-base md:text-lg'>Inicia sesion</span>
 			</Link>
 			<Toaster/>
 		</div>

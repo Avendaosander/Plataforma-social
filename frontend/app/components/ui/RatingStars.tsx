@@ -6,7 +6,7 @@ function RatingStars({rating}: {rating: number}) {
   const maxRating = 5
 
   return (
-    <div className="flex gap-1 items-center -z-10">
+    <div className="flex gap-0.5 sm:gap-1 items-center -z-10">
       {[...Array(maxRating)].map((_, index) => {
         const ratingValue = index + 1;
 
@@ -16,7 +16,7 @@ function RatingStars({rating}: {rating: number}) {
           return (
             <StarIcon
               key={index}
-              className="size-5 fill-yellow-400 text-yellow-400"
+              className="size-4 sm:size-5 fill-yellow-400 text-yellow-400"
             />
           );
         }
@@ -27,17 +27,17 @@ function RatingStars({rating}: {rating: number}) {
           return (
             <StarHalfIcon
               key={index}
-              className="size-5 text-yellow-400"
+              className="size-4 sm:size-5 text-yellow-400"
             />
           );
         }
 
         // Estrella vacía
         return (
-          <StarIcon key={index} className="size-5 opacity-50" />
+          <StarIcon key={index} className="size-4 sm:size-5 opacity-50" />
         );
       })}
-      <p className='font-light ml-1'>{rating}</p>
+      <p className='font-light text-xs sm:text-base ml-1'>{rating}</p>
     </div>
   );
 }

@@ -12,10 +12,10 @@ export default function Layout ({ children } : { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <div className="flex">
-        <aside className="min-w-52">
+        <aside className="lg:min-w-52">
           <Navbar/>
         </aside>
-        <main className="w-full flex flex-col items-center min-h-screen pr-10 py-5 gap-5">
+        <main className="w-full flex flex-col items-center min-h-screen p-5 lg:pr-10 pb-10 lg:py-5 gap-5">
           {children}
         </main>
         <Toaster/>

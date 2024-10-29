@@ -30,7 +30,7 @@ function InputSearch() {
     if (pathname === '/home/search') {
       router.push(`${pathname}?${params.toString()}`)
     } else {
-      router.push(`${pathname}/search?${params.toString()}`)
+      router.push(`${process.env.NEXT_PUBLIC_URL}home/search?${params.toString()}`)
     }
   }
 

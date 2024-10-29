@@ -66,7 +66,7 @@ function MyPosts({idUser}: {idUser: string}) {
 	}
   
   return (
-    <section className='flex flex-col gap-5 w-full items-center'>
+    <section className='flex flex-col gap-5  w-full items-center'>
       {posts?.length == 0 ? (
         <div>
           <p>No hay componentes aun</p>

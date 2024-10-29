@@ -68,6 +68,7 @@ function FormLogin() {
 						id='email'
             name="email"
             value={login.email}
+						autoFocus
             onChange={e => handleLogin(e)}
 					/>
 				</div>
@@ -86,7 +87,6 @@ function FormLogin() {
           type='submit'
           color='primary'
           variant='solid'
-          size='lg'
           marginX='auto'
           shape='md'
 					className="text-md md:text-lg"

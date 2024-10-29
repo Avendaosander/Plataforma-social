@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from "react"
-import { PlusIcon } from "@/icons/icons"
+import { FilterIcon, PlusIcon } from "@/icons/icons"
 import Button from "@/ui/Button"
 import InputSearch from "@/app/components/ui/InputSearch"
 import Link from "next/link"
@@ -41,7 +41,9 @@ function Search({
 		<>
 			<section className='flex flex-col items-center w-full gap-5'>
 				<div className='flex flex-col justify-center items-center w-full max-w-md'>
-					<InputSearch />
+					<div className="max-w-[80%] w-full sm:max-w-md mr-auto sm:mr-0">
+						<InputSearch />
+					</div>
 					<div className='flex items-center justify-center border-b border-white/40 w-full'>
 						<FiltersGroup
 							filter={filterSearh.filter[0]}
@@ -52,33 +54,35 @@ function Search({
 				{contentIsPosts ? (
 					<PostsFiltered search={params} rating={rating}/>
 				) : (
-					<Users />
+					<Users search={params} rating={rating}/>
 				)}
 			</section>
 			<section
-				className={`fixed top-0 right-0 h-screen max-w-[200px] flex flex-col justify-between items-center py-5 px-5 gap-2`}
+				className={`fixed ${contentIsPosts ? 'top-0 right-0' : 'hidden'} max-w-[100px] sm:max-w-[200px] flex flex-col justify-between items-center pt-[18px] pr-5 gap-2 `}
 			>
 				{contentIsPosts && (
 					<>
 						<Button
 							className='px-3 ml-auto'
 							color={`${isFilterActive ? "secondary" : "primary"}`}
-							startContent={<PlusIcon />}
+							startContent={<FilterIcon />}
 							onClick={handleFilterState}
 						>
-							Filtrar
+							<p className="hidden lg:block">
+								Filtrar
+							</p>
 						</Button>
 						<div
 							className={`${
 								isFilterActive
-									? "w-[250px] h-full flex flex-col bg-seagreen-900 dark:bg-storm-950 dark:ring-white/40 dark:ring-1 rounded-l-xl text-white p-3 gap-5"
+									? "w-[250px] h-full flex flex-col bg-seagreen-900 dark:bg-storm-950 dark:ring-white/40 dark:ring-1 rounded-l-xl text-white p-3 gap-3 sm:gap-5"
 									: ""
 							}`}
 						>
 							{isFilterActive && (
 								<>
 									<p className='text-lg text-center font-medium'>Calificacion</p>
-									<div className='flex flex-col gap-5 ml-5 mr-auto'>
+									<div className='flex flex-col gap-3 sm:gap-4 ml-5 mr-auto'>
 										{ratings.map(rat => (
 											<button
 												key={rat}
@@ -94,18 +98,17 @@ function Search({
 						</div>
 					</>
 				)}
-				<Link
-					href={"/home/create"}
-					className={`ml-auto ${!contentIsPosts && 'mt-auto'}`}
-				>
-					<Button
-						className='px-3'
-						startContent={<PlusIcon />}
-					>
-						Crear
-					</Button>
-				</Link>
 			</section>
+			<Link href={"/home/create"}>
+				<Button
+					className='fixed bottom-12 md:bottom-5 right-5 px-3'
+					startContent={<PlusIcon />}
+				>
+					<p className="hidden lg:block">
+						Crear
+					</p>
+				</Button>
+			</Link>
 		</>
 	)
 }

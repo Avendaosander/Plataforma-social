@@ -10,7 +10,7 @@ import Button from "@/ui/Button"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import { useMutation, useQuery } from "@apollo/client"
-import { DELETE_POST, GET_POST } from "@/app/lib/graphql/posts"
+import { DELETE_POST, GET_POST, GET_POSTS_USER } from "@/app/lib/graphql/posts"
 import {
 	CommentInput,
 	CommentsWithData,
@@ -50,6 +50,12 @@ function Post({ params }: { params: { idPost: string } }) {
 		fetchPolicy: "cache-and-network"
 	})
 	const [postDelete, { data: postDeleted }] = useMutation<DataPost>(DELETE_POST)
+	const {refetch} = useQuery(GET_POSTS_USER, {
+		variables: {
+			idUser: data?.getPost.user.id
+		},
+    fetchPolicy: 'cache-and-network'
+	})
 
 	const [postComment, { data: postCommented, loading: commentLoaded }] =
 		useMutation<PostComment, CommentInput>(POST_COMMENT)
@@ -109,6 +115,7 @@ function Post({ params }: { params: { idPost: string } }) {
 			variant: "success",
 			duration: 2000
 		})
+		refetch()
 		router.back()
 	}
 
@@ -141,12 +148,12 @@ function Post({ params }: { params: { idPost: string } }) {
 		):(
 			data?.getPost ? (
 				<>
-					<section className='flex flex-col gap-3 items-center max-w-3xl w-full mr-56'>
-						<h2 className='text-3xl font-semibold'>{data.getPost.title}</h2>
+					<section className='flex flex-col gap-3 items-center w-full max-w-xl lg:max-w-md xxl:max-w-2xl lg:mr-[300px]'>
+						<h2 className='text-2xl md:text-3xl font-semibold'>{data.getPost.title}</h2>
 						<div className='flex flex-col gap-4 w-full'>
 							{/* Container */}
-							<p className='max-w-[80ch]'>{data.getPost.description}</p>
-							<section className='flex gap-5 w-full'> {/* Info */}
+							<p className='max-w-[80ch] text-sm md:text-base'>{data.getPost.description}</p>
+							<section className='flex flex-col md:flex-row gap-5 items-center w-full'> {/* Info */}
 								<Image
 									src={preview}
 									alt='Preview'
@@ -154,7 +161,7 @@ function Post({ params }: { params: { idPost: string } }) {
 									height={120}
 									className='size-[120px]'
 								/>
-								<div className='flex flex-col gap-2'>
+								<div className='flex flex-col gap-2 text-sm md:text-base'>
 									{/*  */}
 									<div className='flex gap-2'>
 										<p className='font-semibold'>Desarrollado por:</p>
@@ -188,17 +195,17 @@ function Post({ params }: { params: { idPost: string } }) {
 									</div>
 								</div>
 							</section>
-							<section className='flex gap-5'> {/* Stats */}
-								<Button
-									className='px-3 py-1'
-									color='primary'
-									variant='flat'
-									shape='full'
-									onClick={() => setIsOpenRating(true)}
-								>
-									Calificar
-								</Button>
-								<div className='flex gap-5'>
+							<section className='flex flex-col sm:flex-row gap-2 items-center'> {/* Stats */}
+								<div className='flex gap-2'>
+									<Button
+										className='px-3 py-1'
+										color='primary'
+										variant='flat'
+										shape='full'
+										onClick={() => setIsOpenRating(true)}
+									>
+										Calificar
+									</Button>
 									<Button
 										className='p-2'
 										color='primary'
@@ -207,45 +214,45 @@ function Post({ params }: { params: { idPost: string } }) {
 										startContent={<DotsIcon className='size-5' />}
 										onClick={handleMore}
 									></Button>
-									{isMore && (
-										<>
-											<Button
-												className='px-3 py-1'
-												color='primary'
-												variant='outline'
-												shape='full'
-												startContent={<ShareIcon className='size-5' />}
-												onClick={() => setIsShareModalOpen(true)}
-											>
-												Compartir
-											</Button>
-											{isMyPost && (
-												<>
-													<Button
-														className='px-3 py-1'
-														color='primary'
-														variant='outline'
-														shape='full'
-														startContent={<EditIcon className='size-5' />}
-														onClick={() => setIsOpenEdit(true)}
-													>
-														Editar
-													</Button>
-													<Button
-														className='px-3 py-1'
-														color='destructive'
-														variant='outline'
-														shape='full'
-														startContent={<TrashIcon className='size-5' />}
-														onClick={() => handleDelete()}
-													>
-														Eliminar
-													</Button>
-												</>
-											)}
-										</>
-									)}
 								</div>
+								{isMore && (
+									<div className="flex flex-col sm:flex-row gap-2">
+										<Button
+											className='px-3 py-1'
+											color='primary'
+											variant='outline'
+											shape='full'
+											startContent={<ShareIcon className='size-5' />}
+											onClick={() => setIsShareModalOpen(true)}
+										>
+											Compartir
+										</Button>
+										{isMyPost && (
+											<>
+												<Button
+													className='px-3 py-1'
+													color='primary'
+													variant='outline'
+													shape='full'
+													startContent={<EditIcon className='size-5' />}
+													onClick={() => setIsOpenEdit(true)}
+												>
+													Editar
+												</Button>
+												<Button
+													className='px-3 py-1'
+													color='destructive'
+													variant='outline'
+													shape='full'
+													startContent={<TrashIcon className='size-5' />}
+													onClick={() => handleDelete()}
+												>
+													Eliminar
+												</Button>
+											</>
+										)}
+									</div>
+								)}
 							</section>
 							{data.getPost.File.map(file => (
 								<section
@@ -253,7 +260,7 @@ function Post({ params }: { params: { idPost: string } }) {
 									className='flex flex-col gap-2 py-2'
 								> {/* Code */}
 									<div className='flex w-full justify-between items-center'>
-										<p className='text-lg font-semibold'>{file.file}</p>
+										<p className='text-sm md:text-lg font-semibold text-ellipsis'>{file.file}</p>
 										<a
 											href={`${process.env.NEXT_PUBLIC_API_ROUTE_FILE}${file.file}`}
 											download={file.file}
@@ -261,14 +268,14 @@ function Post({ params }: { params: { idPost: string } }) {
 											<Button
 												color='primary'
 												variant='solid'
-												className='px-5'
+												className='px-2 md:px-5 text-sm md:text-base'
 											>
 												Descargar archivo
 											</Button>
 										</a>
 									</div>
 									<div className='bg-storm-900 rounded-xl p-5 text-white'>
-										<pre className='max-h-60 overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-storm-50/20 hover:scrollbar-thumb-white/50 active:scrollbar-thumb-white scrollbar-thumb-rounded-full'>
+										<pre className='max-h-60 text-xs md:text-base overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-storm-50/20 hover:scrollbar-thumb-white/50 active:scrollbar-thumb-white scrollbar-thumb-rounded-full'>
 											{fileContents[file.file]}
 										</pre>
 									</div>

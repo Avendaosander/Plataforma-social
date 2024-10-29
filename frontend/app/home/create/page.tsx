@@ -215,14 +215,14 @@ function Page() {
 	} 
 
 	return (
-		<div className='flex flex-col h-full max-w-3xl w-full gap-2'>
-			<h3 className='text-3xl font-semibold text-center'>
+		<div className='flex flex-col h-full max-w-xl md:max-w-2xl w-full gap-2 pb-5 md:pb-0'>
+			<h3 className='text-xl md:text-3xl font-semibold text-center'>
 				Comparte tu componente
 			</h3>
 			<section className='flex flex-col gap-1 px-5'>
 				<label
 					htmlFor='title'
-					className='text-lg font-semibold'
+					className='text-base md:text-lg font-semibold'
 				>
 					Titulo
 				</label>
@@ -240,7 +240,7 @@ function Page() {
 			<section className='flex flex-col gap-1 px-5'>
 				<label
 					htmlFor='description'
-					className='text-lg font-semibold'
+					className='text-base md:text-lg font-semibold'
 				>
 					Descripcion
 				</label>
@@ -257,7 +257,7 @@ function Page() {
 				</span>
 			</section>
 			<div className='border-b border-seagreen-900/20 dark:border-white/20'></div>
-			<section className='flex gap-10 px-5 items-center justify-start'>
+			<section className='flex flex-col md:flex-row gap-5 md:gap-10 px-5 items-center justify-start'>
 				<div className='relative w-32'>
 					<input
 						type='file'
@@ -268,21 +268,21 @@ function Page() {
 					/>
 					<Image
 						src={typeof previewSrc === "string" ? previewSrc : ""}
-						width={128}
-						height={128}
+						width={112}
+						height={112}
 						alt='Imagen del Evento'
-						className='size-32 object-cover ring-2 ring-slate-500/30 rounded-full'
+						className='size-28 object-cover ring-2 ring-slate-500/30 rounded-full'
 					/>
 					<label
 						htmlFor='avatar'
-						className='absolute -right-3 top-[3.3rem] cursor-pointer bg-seagreen-900 rounded-full p-1'
+						className='absolute right-0 md:-right-3 top-11 cursor-pointer bg-seagreen-900 rounded-full p-1'
 					>
 						<PlusIcon className='text-white size-5' />
 					</label>
 				</div>
 				<div className='flex flex-col gap-2'>
-					<div className='flex gap-5 items-center'>
-						<div className='flex gap-5 items-center'>
+					<div className='flex flex-col md:flex-row gap-3 items-center'>
+						<div className='flex gap-3 items-center'>
 							<label
 								htmlFor='deduction'
 								className='font-semibold'
@@ -296,7 +296,7 @@ function Page() {
 							/>
 						</div>
 						{existTech(stack, "Other") && (
-							<>
+							<div className="flex gap-3">
 								<Input
 									type='text'
 									id='otherTech'
@@ -306,7 +306,7 @@ function Page() {
 										setOtherTech(e.target.value)
 									}
 									placeholder='Nombre de la tecnologia'
-									className='ring-0 bg-white max-w-sm'
+									className='ring-0 bg-white max-w-36'
 								/>
 								<Button
 									size='sm'
@@ -316,7 +316,7 @@ function Page() {
 								>
 									Añadir
 								</Button>
-							</>
+							</div>
 						)}
 					</div>
 					<div className='flex flex-wrap gap-2 min-h-7'>
@@ -352,7 +352,7 @@ function Page() {
 			<section className='flex flex-col gap-2 px-5'>
 				<label
 					htmlFor='files'
-					className='text-lg font-semibold'
+					className='text-base md:text-lg font-semibold'
 				>
 					Archivos
 				</label>
@@ -382,7 +382,7 @@ function Page() {
 					startContent={<PlusIcon className='size-5' />}
 					marginX='none'
 					variant='flat'
-					className='justify-center'
+					className='justify-center text-sm md:text-base py-1 md:py-2'
 					onClick={handleAddFile}
 				>
 					Subir archivo
@@ -393,7 +393,7 @@ function Page() {
 				<Button
 					variant='solid'
 					color='primary'
-					className='px-10'
+					className='px-10 text-sm md:text-base py-1 md:py-2'
 					onClick={handleSubmit}
 				>
 					Publicar

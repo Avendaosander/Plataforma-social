@@ -124,7 +124,7 @@ function CardPost({
 		: "/Image.png"
 
 	return (
-		<article className='flex flex-col gap-3 p-3 w-full max-w-3xl rounded-2xl ring-1 ring-seagreen-900 bg-white dark:bg-transparent dark:ring-white'>
+		<article className='flex flex-col gap-3 p-3 w-full max-w-xs sm:max-w-md lg:max-w-3xl rounded-2xl ring-1 ring-seagreen-900 bg-white dark:bg-transparent dark:ring-white'>
 			<header className='flex justify-between items-center'>
 				<div className='flex gap-2 items-center'>
 					<Link
@@ -146,8 +146,7 @@ function CardPost({
 								variant='outline'
 								color='primary'
 								shape='md'
-								size='md'
-								className='px-3 py-0.5 dark:bg-inherit dark:ring-white dark:text-white'
+								className='px-3 py-0.5 text-xs lg:text-base leading-tight dark:bg-inherit dark:ring-white dark:text-white'
 								onClick={handleFetchFollowing}
 							>
 								Siguiendo
@@ -158,24 +157,24 @@ function CardPost({
 								color='primary'
 								shape='md'
 								size='md'
-								className='px-3 py-0.5'
+								className='px-3 py-0.5 text-xs lg:text-base leading-tight'
 								onClick={handleFetchFollowing}
 							>
 								Seguir
 							</Button>
 						))}
 				</div>
-				<span className='opacity-75'>{getTimeElapsed(post.createdAt)}</span>
+				<span className='opacity-75 text-xs sm:text-base'>{getTimeElapsed(post.createdAt)}</span>
 			</header>
 			<Link href={`/home/post/${post.id}`}>
-				<h3 className='text-lg font-bold px-2'>{post.title}</h3>
+				<h3 className='text-lg font-bold px-2 text-center lg:text-start'>{post.title}</h3>
 			</Link>
-			<div className='flex justify-between gap-3'>
+			<div className='flex flex-col-reverse lg:flex-row justify-between gap-3'>
 				<div className='flex flex-col gap-3 h-full justify-between'>
-					<p className='text-lg max-w-[50ch] px-2'>
+					<p className='lg:text-lg max-w-[50ch] px-2'>
 						{truncateText(post.description, 290)}
 					</p>
-					<div className='flex text-start gap-2 p-2 '>
+					<div className='flex text-start flex-wrap gap-2 p-2 '>
 						{post?.Stack?.length > 0 &&
 							post.Stack.map(tech => (
 								<Link
@@ -198,7 +197,7 @@ function CardPost({
 					</div>
 				</div>
 				<div className='flex flex-col items-center gap-3 h-full justify-between'>
-					<div className='p-6'>
+					<div className='p-6 w-28 h-w-28 sm:w-32 sm:h-32'>
 						<Image
 							src={previewSrc}
 							alt={post.title}
@@ -228,8 +227,8 @@ function CardPost({
 								<Image
 									src={previewSrc}
 									alt={post.title}
-									width={500}
-									height={500}
+									width={300}
+									height={300}
 									className="transition-transform duration-500 ease-in-out transform scale-100"
 								/>
 							</div>
@@ -237,17 +236,17 @@ function CardPost({
 					)}
 				</div>
 			</div>
-			<footer className='border-t border-seagreen-950/40 dark:border-white/40 flex justify-between px-3 pt-3'>
+			<footer className='border-t border-seagreen-950/40 dark:border-white/40 flex justify-between items-center px-3 pt-3'>
 				<div className='flex gap-1 items-center'>
 					<RatingStars rating={post.rating}/>
 				</div>
 				<div className='flex gap-1 items-center'>
-					<MessageIcon className='size-5' />
-					<p className='font-light'>{post.comments}</p>
+					<MessageIcon className='size-4' />
+					<p className='font-light text-xs sm:text-base'>{post.comments}</p>
 				</div>
-				<ShareIcon className='size-5 cursor-pointer' onClick={() => setIsShareModalOpen(true)}/>
+				<ShareIcon className='size-4 cursor-pointer' onClick={() => setIsShareModalOpen(true)}/>
 				<div className='flex gap-1 items-center'>
-					<p className='font-light'>{post.saved}</p>
+					<p className='font-light text-xs sm:text-base'>{post.saved}</p>
 					<ButtonBookmark isSaved={post.isSaved} handlePostSaved={handleFetchPostSaved}/>
 				</div>
 			</footer>

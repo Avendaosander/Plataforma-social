@@ -49,11 +49,11 @@ function ShareModal({ onClose, shareUrl }: ShareModalProps) {
 
 	return (
     
-    <div className='fixed top-0 bottom-0 left-0 right-0 bg-black/50 max-h-screen flex justify-center items-center'>
+    <div className='fixed top-0 bottom-0 left-0 right-0 bg-black/50 max-h-screen flex justify-center items-center z-20'>
   
-		  <section className='flex flex-col bg-storm-50 dark:bg-storm-950 rounded-xl max-w-md w-full'>
+		  <section className='flex flex-col bg-storm-50 dark:bg-storm-950 rounded-xl max-w-xs sm:max-w-md w-full'>
         <header className='flex justify-between items-center p-5 border-b border-seagreen-950/40 dark:border-white/20'>
-          <h3 className='text-2xl font-semibold'>Comparte el enlace con tus amigos</h3>
+          <h3 className='text-lg sm:text-2xl font-semibold text-ellipsis'>Comparte el enlace con tus amigos</h3>
           <button onClick={() => onClose()}>
             <XIcon />
           </button>

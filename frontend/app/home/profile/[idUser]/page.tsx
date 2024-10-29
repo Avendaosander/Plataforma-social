@@ -3,23 +3,20 @@
 import React, { useState } from "react"
 import { useUserStore } from "@/app/store/user"
 import Button from "@/ui/Button"
-import CardPost from "@/ui/CardPost"
 import Badge from "@/components/profile/Badge"
 import EditProfile from "@/components/profile/EditProfile"
 import InfoProfile from "@/components/profile/InfoProfile"
 import { PlusIcon } from "@/icons"
 import Link from "next/link"
-import { GET_POSTS_USER } from "@/app/lib/graphql/posts"
 import {
 	DataUserProfile,
 	GetFollower,
-	GetPostsUser
 } from "@/app/lib/types/typesGraphql"
 import { useQuery } from "@apollo/client"
 import { GET_USER } from "@/app/lib/graphql/users"
 import { GET_FOLLOWERS } from "@/app/lib/graphql/followers"
 import MyPosts from "@/app/components/profile/MyPosts"
-import { usePathname, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import PostsSaved from "@/app/components/profile/PostsSaved"
 
 const FILTERS = {
@@ -37,7 +34,7 @@ function Profile({ params }: { params: { idUser: string } }) {
 		variables: {
 			id: params.idUser
 		},
-		fetchPolicy: 'cache-and-network'
+		fetchPolicy: "network-only"
 	})
 
 	const { data: followers, loading: loadingFollowers } = useQuery<GetFollower>(GET_FOLLOWERS, {
@@ -78,7 +75,7 @@ function Profile({ params }: { params: { idUser: string } }) {
 					<MyPosts idUser={params.idUser}/>
 				)}
 				{isEditMode && (
-					<div className='absolute top-0 bottom-0 left-0 right-0 bg-black/50 flex justify-center items-center'>
+					<div className='absolute top-0 bottom-0 left-0 right-0 bg-black/50 flex justify-center items-center z-10'>
 						<EditProfile
 							onClose={handleEditMode}
 							user={user.getUser}
@@ -87,10 +84,12 @@ function Profile({ params }: { params: { idUser: string } }) {
 				)}
 				<Link href={"/home/create"}>
 					<Button
-						className='fixed bottom-5 right-5 px-3'
+						className='fixed bottom-12 md:bottom-5 right-5 px-3'
 						startContent={<PlusIcon />}
 					>
-						Crear
+						<p className="hidden lg:block">
+							Crear
+						</p>
 					</Button>
 				</Link>
 			</>

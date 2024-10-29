@@ -37,7 +37,7 @@ function Navbar() {
 	const [hasMore, setHasMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
 
-	const { data, loading, error, fetchMore} = useQuery<GetNotifications>(GET_NOTIFICATIONS, {
+	const { data, loading, error, fetchMore, refetch} = useQuery<GetNotifications>(GET_NOTIFICATIONS, {
 		variables: { idUser },
 		fetchPolicy: "network-only"
 	})
@@ -74,11 +74,11 @@ function Navbar() {
 	}
 	
 
-	const widthCondition = notifyOpen ? "w-auto h-11" : "w-full"
-	const notifyClasses = `mx-0 px-3 ${
+	const widthCondition = notifyOpen ? "w-auto lg:h-11" : "w-auto md:w-full"
+	const notifyClasses = `mx-0 p-1.5 md:p-2 lg:px-3 ${
 		notifyOpen
-			? "w-auto h-11 bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
-			: "w-full hover:bg-lima-400/30 dark:hover:bg-biscay-900"
+			? "w-auto lg:h-11 bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
+			: "w-auto md:w-full hover:bg-lima-400/30 dark:hover:bg-biscay-900"
 	}`
 	const mainHandle = () => {
 		setMainActive(!mainActive)
@@ -115,66 +115,92 @@ function Navbar() {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [mainActive, notifyOpen, notifications, hasMore, loadingMore])
 
+	useEffect(() => {
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.addEventListener('message', (event) => {
+				if (event.data && event.data.type === 'NEW_NOTIFICATION') {
+					refetch()
+				}
+			});
+		}
+	}, []);
+
 	return (
-		<section className={`fixed flex gap-5 bg-seagreen-900 dark:border-r dark:border-white/40 dark:bg-transparent ${pathname === `/home/profile/${idUser}/settings` ? 'hidden' : ''}`}>
+		<section className={`fixed bottom-0 w-full md:w-auto flex gap-5 bg-seagreen-900 dark:border-t lg:dark:border-r  dark:border-white/40 dark:bg-storm-950 ${pathname === `/home/profile/${idUser}/settings` ? 'hidden' : ''} z-10`}>
 			<div
-				className={`h-screen ${
-					notifyOpen ? "border-r border-white/40 mr-5" : "min-w-52"
-				} flex-grow flex flex-col items-start size justify-between px-3 py-2`}
+				className={`h-11 md:h-screen w-full lg:w-auto ${
+					notifyOpen ? "border-t md:border-t-0 md:border-r border-white/40 md:mr-5" : "lg:min-w-52"
+				} flex-grow flex flex-row md:flex-col items-start size justify-center md:justify-between px-3 py-2 gap-1`}
 			>
-				<Link href={"/home"}>
+				<Link href={"/home"} className="hidden md:block">
 					<Button
 						size='lg'
-						className={`mx-0 px-3 ${widthCondition}`}
+						className={`mx-0 p-1.5 md:p-2 lg:px-3 ${widthCondition}`}
 						startContent={<LogoIcon className="size-6"/>}
 					>
-						{!notifyOpen && "UVM Dev House"}
+						{!notifyOpen && (
+							<p className="hidden lg:block">
+								UVM Dev House
+							</p>
+						)}
 					</Button>
 				</Link>
-				<nav className={`w-full`}>
-					<ul className='flex flex-col gap-4 relative'>
+				<nav className={`lg:w-full`}>
+					<ul className='flex flex-row md:flex-col gap-1 md:gap-4 relative w-full'>
 						<li>
 							<Link href={"/home"}>
 								<Button
 									size='lg'
-									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
+									className={`mx-0 p-1.5 md:p-2 lg:px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
 										pathname == "/home"
 											? "bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
 											: ""
 									}`}
-									startContent={<HomeIcon />}
+									startContent={<HomeIcon className="size-4 md:size-5" />}
 								>
-									{!notifyOpen && "Para ti"}
+									{!notifyOpen && (
+										<p className="hidden lg:block">
+											Para ti
+										</p>
+									)}
 								</Button>
 							</Link>
 						</li>
-						<li>
+						<li className="hidden md:block">
 							<Link href={"/home/followers"}>
 								<Button
 									size='lg'
-									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
+									className={`mx-0 p-1.5 md:p-2 lg:px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
 										pathname == "/home/followers"
 											? "bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
 											: ""
 									}`}
-									startContent={<UserCheck />}
+									startContent={<UserCheck className="size-4 md:size-5" />}
 								>
-									{!notifyOpen && "Siguiendo"}
+									{!notifyOpen && (
+										<p className="hidden lg:block">
+											Siguiendo
+										</p>
+									)}
 								</Button>
 							</Link>
 						</li>
-						<li>
+						<li className="hidden md:block">
 							<Link href={"/home/populates"}>
 								<Button
 									size='lg'
-									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
+									className={`mx-0 p-1.5 md:p-2 lg:px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
 										pathname == "/home?page=trending"
 											? "bg-lima-400/30 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
 											: ""
 									}`}
-									startContent={<TrendingIcon />}
+									startContent={<TrendingIcon className="size-4 md:size-5" />}
 								>
-									{!notifyOpen && "Populares"}
+									{!notifyOpen && (
+										<p className="hidden lg:block">
+											Populares
+										</p>
+									)}
 								</Button>
 							</Link>
 						</li>
@@ -182,61 +208,76 @@ function Navbar() {
 							<Link href={"/home/search"}>
 								<Button
 									size='lg'
-									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
+									className={`mx-0 p-1.5 md:p-2 lg:px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
 										pathname == "/home/search"
 											? "bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
 											: ""
 									}`}
-									startContent={<SearchIcon />}
+									startContent={<SearchIcon className="size-4 md:size-5" />}
 								>
-										{!notifyOpen && "Buscar"}
+									{!notifyOpen && (
+										<p className="hidden lg:block">
+											Buscar
+										</p>
+									)}
 								</Button>
 							</Link>
 						</li>
-						<li className="relative">
+						<li>
 							<Button
 								size='lg'
 								onClick={notifyHandle}
 								className={notifyClasses}
-								startContent={<BellIcon />}
+								startContent={
+									<div className="relative inline-block">
+										<BellIcon className={`size-4 md:size-5 ${unread >= 1 && 'text-lima-500'}`}/>
+										{unread >= 1 && (
+											<span className="absolute top-0 right-0 w-1 h-1 md:w-2 md:h-2 bg-lima-500 rounded-full ring-1 ring-white"></span>
+										)}
+									</div>
+								}
 							>
-								{!notifyOpen && "Notificaciones"}
+								{!notifyOpen && (
+									<p className={`hidden lg:block ${unread >= 1 && 'text-lima-500'}`}>
+										Notificaciones
+									</p>
+								)}
 							</Button>
-							{notifications && unread >= 1 && (
-								<p className="absolute top-0 right-0 px-2 py-1 rounded-full bg-lima-500 text-xs">{unread}</p>
-							)}
 						</li>
 						<li>
 							<Link href={`/home/profile/${idUser}`}>
 								<Button
 									size='lg'
-									className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
+									className={`mx-0 p-1.5 md:p-2 lg:px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
 										pathname == `/home/profile/${idUser}`
 											? "bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
 											: ""
 									}`}
-									startContent={<UserIcon />}
+									startContent={<UserIcon className="size-4 md:size-5" />}
 								>
-									{!notifyOpen && "Perfil"}
+									{!notifyOpen && (
+										<p className="hidden lg:block">
+											Perfil
+										</p>
+									)}
 								</Button>
 							</Link>
 						</li>
 					</ul>
 				</nav>
-				<div className={`w-full`}>
+				<div className={`relative w-auto lg:w-full`}>
 					{mainActive && (
 						<div
-							className='absolute bottom-16 z-30 w-[12rem] py-3 bg-seagreen-900 dark:bg-storm-900 shadow-medium dark:shadow-none rounded-xl'
+							className='absolute bottom-10 right-0 md:left-0 md:bottom-16 z-30 w-[12rem] py-3 bg-seagreen-900 dark:bg-storm-900 shadow-medium dark:shadow-none rounded-xl'
 							id='main'
 						>
 							<ul className='flex flex-col gap-3'>
 								<li>
 									<Link href={`/home/profile/${idUser}/settings`}>
 										<Button
-											size='lg'
-											className='mx-0 px-3 w-full hover:bg-lima-400/30 dark:hover:bg-biscay-900'
+											className='mx-0 px-3 text-sm md:text-lg w-full hover:bg-lima-400/30 dark:hover:bg-biscay-900'
 											shape='none'
-											startContent={<SettingsIcon />}
+											startContent={<SettingsIcon className="size-4 md:size-5" />}
 											onClick={mainHandle}
 											>
 											Configuraciones
@@ -249,10 +290,9 @@ function Navbar() {
 										className='w-full text-start'
 									>
 										<Button
-											size='lg'
-											className='mx-0 px-3 w-full hover:bg-lima-400/30 dark:hover:bg-biscay-900'
+											className='mx-0 px-3 text-sm md:text-lg w-full hover:bg-lima-400/30 dark:hover:bg-biscay-900'
 											shape='none'
-											startContent={<BookmarksIcon />}
+											startContent={<BookmarksIcon className="size-4 md:size-5" />}
 											onClick={mainHandle}
 										>
 											Guardados
@@ -264,10 +304,9 @@ function Navbar() {
 								</li>
 								<li>
 									<Button
-										size='lg'
-										className='mx-0 px-3 w-full hover:bg-lima-400/30 dark:hover:bg-biscay-900'
+										className='mx-0 px-3 text-sm md:text-lg w-full hover:bg-lima-400/30 dark:hover:bg-biscay-900'
 										shape='none'
-										startContent={<LogoutIcon />}
+										startContent={<LogoutIcon className="size-4 md:size-5" />}
 										onClick={logout}
 									>
 										Salir
@@ -279,20 +318,24 @@ function Navbar() {
 					<Button
 						size='lg'
 						onClick={mainHandle}
-						className={`mx-0 px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
+						className={`mx-0 p-1.5 md:p-2 lg:px-3 ${widthCondition} hover:bg-lima-400/30 dark:hover:bg-biscay-900 ${
 							mainActive
 								? "bg-lima-400/30 dark:bg-biscay-950 hover:bg-lima-400/50 dark:hover:bg-biscay-900"
 								: ""
 						}`}
-						startContent={<MenuIcon />}
+						startContent={<MenuIcon className="size-4 md:size-5" />}
 					>
-						{!notifyOpen && (mainActive ? "Menos" : "Mas")}
+						{!notifyOpen && (
+							<p className="hidden lg:block">
+								{mainActive ? "Menos" : "Mas"}
+							</p>
+						)}
 					</Button>
 				</div>
 			</div>
 			{notifyOpen && (
 				<div
-					className='absolute left-full w-[300px] h-screen bg-seagreen-900 dark:bg-storm-950  text-storm-100 py-2 pr-4 flex flex-col gap-3 border-r border-white/40 overflow-auto scrollbar-thin'
+					className='absolute bottom-full md:bottom-0 md:left-full w-full md:w-[300px] h-screen bg-seagreen-900 dark:bg-storm-950  text-storm-100 py-2 px-2 md:pl-0 md:pr-4 flex flex-col gap-3 md:border-r border-white/40 overflow-auto scrollbar-thin'
 					id='notify'
 				>
 					<h3 className='text-lg font-semibold border-b-[1px]'>Notificaciones</h3>
