@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 const prisma = new PrismaClient();
 
@@ -15,6 +18,9 @@ function getRandomItems<T>(array: T[], count: number): T[] {
 const startDate = new Date('2020-01-01')
 const endDate = new Date()
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 export const defaultData = async () => {
   try {
     const userCount = await prisma.user.count();
@@ -23,13 +29,35 @@ export const defaultData = async () => {
       const testPassword = '123'
       const hashedPassword = await bcrypt.hash(testPassword, 10);
 
-      const newUsers = Array.from({ length: 20 }, (_, index) => ({
-        email: `user${index + 1}@gmail.com`,
-        username: `user${index + 1}`,
-        password: hashedPassword,
-        description: `This is user ${index + 1}`,
-        avatar: `avatar${index + 1}.png`,
-      }));
+      const newUsers = []
+
+      for (let index = 0; index < 20; index++) {
+        const email = `user${index + 1}@gmail.com`;
+        const username = `user${index + 1}`;
+        const description = `This is user ${index + 1}`;
+        const createdAt = getRandomDate(startDate, endDate);
+  
+        // URL del avatar
+        const avatarUrl = `https://i.pravatar.cc/150?img=${index + 1}`;
+        const avatarFileName = `${Date.now()}-avatar${index + 1}.png`;
+        const avatarPath = path.join(__dirname, '../../uploads/avatar/', avatarFileName);
+  
+        // Descargar y guardar la imagen de avatar
+        const response = await fetch(avatarUrl)
+        const arrayBuffer = await response.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+        fs.writeFileSync(avatarPath, buffer)
+  
+        // Añadir usuario a la lista con el avatar actualizado
+        newUsers.push({
+          email,
+          username,
+          password: hashedPassword,
+          description,
+          avatar: avatarFileName,
+          createdAt,
+        });
+      }
 
       // Inserción de los usuarios
       await prisma.user.createMany({
@@ -47,24 +75,52 @@ export const defaultData = async () => {
       });
 
       let postCounter = 1
-
+      const API_KEY = 'VYVQBEvZytGj9g1oZV4pkQ==sLisaTPpvGIQ7R2J';
 			const posts = usersCreated.flatMap((user) => {
-				// Generar un número aleatorio de publicaciones entre 2 y 10 para cada usuario
-				const numberOfPosts = Math.floor(Math.random() * (5 - 2 + 1)) + 2;
-
-				return Array.from({ length: numberOfPosts }, () => {
-					const postName = `post${postCounter}`
-					postCounter++
-
-					return {
-						idUser: user.id,
-						title: postName, // Título y preview con el mismo nombre
-						description: `Description for ${postName} of user ${user.username}`,
-						preview: `${postName}.png`, // Preview con el mismo nombre que el título
-						createdAt: getRandomDate(startDate, endDate),
-					};
-				});
-			});
+        // Generar un número aleatorio de publicaciones entre 2 y 10 para cada usuario
+        const numberOfPosts = Math.floor(Math.random() * (5 - 2 + 1)) + 2;
+      
+        return Array.from({ length: numberOfPosts }, (_, postIndex) => {
+          const postName = `post${postCounter}`;
+          postCounter++;
+      
+          // URL de la API de imagen aleatoria
+          const previewUrl = `https://api.api-ninjas.com/v1/randomimage?category=technology`;
+          const previewFileName = `${Date.now()}-${postName}.jpg`;
+      
+          // Ruta para guardar la imagen en /uploads/preview/
+          const previewPath = path.resolve(__dirname, '../../uploads/preview/', previewFileName);
+      
+          // Descargar y guardar la imagen de preview
+          fetch(previewUrl, {
+            headers: {
+              'X-Api-Key': API_KEY,
+              'Accept': 'image/jpg',
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`Error downloading image: ${response.statusText}`);
+              }
+              return response.arrayBuffer();
+            })
+            .then((arrayBuffer) => {
+              const buffer = Buffer.from(arrayBuffer);
+              fs.writeFileSync(previewPath, buffer);
+            })
+            .catch((error) => {
+              console.error(`Error downloading preview for ${postName}:`, error);
+            });
+      
+          return {
+            idUser: user.id,
+            title: postName,
+            description: `Description for ${postName} of user ${user.username}`,
+            preview: previewFileName, // Asignar el nombre de archivo de preview al campo
+            createdAt: getRandomDate(startDate, endDate),
+          };
+        });
+      });
 
       // Inserción de las publicaciones en Prisma
       await prisma.post.createMany({
