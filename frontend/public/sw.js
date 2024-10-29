@@ -14,6 +14,15 @@ self.addEventListener("push", event => {
       });
     });
   }, 20000)
+
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'NEW_NOTIFICATION',
+        notification: data
+      });
+    });
+  });
 })
 
 self.addEventListener("notificationclick", event => {
