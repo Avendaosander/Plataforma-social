@@ -2,7 +2,7 @@ export const typeDefs = `#graphql
    type Query {
       login(email: String!, password: String!): LoginResponse
       getUser(id: String!): UserProfile
-      getUsers: [UserProfile]
+      getUsers(filter: PostFilterInput!, cursor: String, take: Int): GetUsersFilter
       getPost(id: String!): Post
       getPosts(cursor: String, take: Int): GetPosts
       getPostsPopulate(cursor: String, take: Int): GetPostsPopulate
@@ -49,6 +49,12 @@ export const typeDefs = `#graphql
       password: String
       description: String
       avatar: String
+   }
+
+   type GetUsersFilter {
+      users: [UserProfile]
+      cursor: String
+      hasMore: Boolean
    }
 
    type UserProfile {

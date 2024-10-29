@@ -2,13 +2,13 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { Context, Token } from '../../types';
+import { Context, PostFilterInput, Token } from '../../types';
 import { promises as fs } from 'fs';
 import path from 'path';
 
 const prisma = new PrismaClient();
 
-export const getUsers = async (_: any, {}, context: Context) => {
+export const getUsers = async (_: any, {filter, cursor, take}: {filter: PostFilterInput, cursor?: string, take?: number}, context: Context) => {
 	try {
 		if (!context.auth) {
 			throw new GraphQLError("Not authenticated", {
@@ -18,8 +18,19 @@ export const getUsers = async (_: any, {}, context: Context) => {
 				}
 			})
 		}
+		const { user } = filter
 
-    return await prisma.user.findMany({
+		const limit = take || 10;
+    
+    const users =  await prisma.user.findMany({
+			where: {
+				...(user && { username: {contains: user} }),
+				...(cursor && {
+					createdAt: {
+						lt: new Date(parseInt(cursor)),
+					},
+				}),
+      },
       include: {
         _count: {
           select: {
@@ -27,8 +38,22 @@ export const getUsers = async (_: any, {}, context: Context) => {
             Post: true
           }
         }
-      }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: limit + 1
     })
+
+		const hasMore = users.length > limit
+    
+		const limitedUsers = hasMore ? users.slice(0, limit) : users
+
+    return {
+			users: limitedUsers,
+			cursor: limitedUsers.length > 0 ? limitedUsers[limitedUsers.length - 1].createdAt.getTime().toString() : null,
+			hasMore
+		}
 
 	} catch (error) {
     if (error instanceof GraphQLError) {
