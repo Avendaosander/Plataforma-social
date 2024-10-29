@@ -61,7 +61,13 @@ export type UserInfo = {
 }
 
 export type GetUsers = {
-	getUsers: GetUserProfile[]
+	getUsers: GetUserFilter
+}
+
+export type GetUserFilter = {
+	users: GetUserProfile[],
+	cursor: string
+	hasMore: boolean
 }
 
 // LOGIN

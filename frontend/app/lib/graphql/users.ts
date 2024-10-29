@@ -32,18 +32,22 @@ export const GET_USER = gql`
 `
 
 export const GET_USERS = gql`
-  query GetUsers {
-    getUsers {
-      id
-      username
-      email
-      description
-      avatar
-      _count {
-        followers
-        following
-        Post
+  query GetUsers($filter: PostFilterInput!, $cursor: String, $take: Int) {
+    getUsers(filter: $filter, cursor: $cursor, take: $take) {
+      users {
+        id
+        username
+        email
+        password
+        description
+        avatar
+        _count {
+          following
+          Post
+        }
       }
+      cursor
+      hasMore
     }
   }
 `
