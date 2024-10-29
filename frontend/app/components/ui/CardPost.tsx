@@ -144,7 +144,7 @@ function CardPost({
 						(post.isFollowing ? (
 							<Button
 								variant='outline'
-								color='primary'
+								color='secondary'
 								shape='md'
 								className='px-3 py-0.5 text-xs lg:text-base leading-tight dark:bg-inherit dark:ring-white dark:text-white'
 								onClick={handleFetchFollowing}
@@ -154,7 +154,7 @@ function CardPost({
 						) : (
 							<Button
 								variant='solid'
-								color='primary'
+								color='secondary'
 								shape='md'
 								size='md'
 								className='px-3 py-0.5 text-xs lg:text-base leading-tight'
@@ -207,7 +207,7 @@ function CardPost({
 					</div>
 					<div className='p-2'>
 						<Button
-							variant='flat'
+							variant='ghost'
 							color='secondary'
 							shape='full'
 							size='sm'

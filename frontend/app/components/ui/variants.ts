@@ -17,9 +17,9 @@ const flat = {
 }
 
 const ghost = {
-  primary: `text-seagreen-900 dark:text-white`,
-  secondary: `text-biscay-950 dark:text-white`,
-  destructive: `text-maroon-900 dark:text-maroon-500`,
+  primary: `text-seagreen-900 dark:text-white bg-seagreen-600/10`,
+  secondary: `text-biscay-950 dark:text-white bg-biscay-600/10`,
+  destructive: `text-maroon-900 dark:text-maroon-500 bg-maroon-600/10`,
 }
 
 export const Variants = {
